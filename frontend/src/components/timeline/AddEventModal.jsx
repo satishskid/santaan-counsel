@@ -22,33 +22,74 @@ const EVENT_TYPES = [
 const UNDERSTANDING_LEVELS = ['clear', 'partial', 'confused'];
 const EMOTIONAL_RESPONSES = ['calm', 'anxious', 'hopeful', 'worried', 'excited'];
 
-// Quick-select common clinical values
+// Clinical reference ranges for validation and visual indicators
+const CLINICAL_RANGES = {
+  E2: { unit: 'pg/mL', low: 200, normal: [200, 1000], high: 1000, desc: 'Estradiol' },
+  P4: { unit: 'ng/mL', low: 1, normal: [0, 1], high: 2, desc: 'Progesterone' },
+  FSH: { unit: 'mIU/mL', low: 3, normal: [3, 10], high: 10, desc: 'FSH' },
+  LH: { unit: 'mIU/mL', low: 1, normal: [1, 12], high: 12, desc: 'LH' },
+  AMH: { unit: 'ng/mL', low: 1, normal: [1, 4], high: 4, desc: 'AMH' },
+  AFC: { unit: 'follicles', low: 5, normal: [5, 15], high: 15, desc: 'Antral Follicle Count' },
+  Lining: { unit: 'mm', low: 7, normal: [7, 14], high: 14, desc: 'Endometrial Thickness' },
+};
+
+// Helper to determine value status
+const getValueStatus = (marker, value) => {
+  const range = CLINICAL_RANGES[marker];
+  if (!range) return 'normal';
+  const numValue = parseFloat(value);
+  if (numValue < range.normal[0]) return 'low';
+  if (numValue > range.normal[1]) return 'high';
+  return 'normal';
+};
+
+// Quick-select common clinical values with range indicators
 const QUICK_VALUES = {
   hormone: [
-    { label: 'E2: 200', value: 'E2: 200 pg/mL' },
-    { label: 'E2: 400', value: 'E2: 400 pg/mL' },
-    { label: 'E2: 650', value: 'E2: 650 pg/mL' },
-    { label: 'P4: <1', value: 'P4: 0.8 ng/mL' },
-    { label: 'FSH: 7', value: 'FSH: 7 mIU/mL' },
+    { label: 'E2: 200', value: 'E2: 200', status: 'normal', hint: '(Normal - Early stim)' },
+    { label: 'E2: 400', value: 'E2: 400', status: 'normal', hint: '(Normal - Mid stim)' },
+    { label: 'E2: 650', value: 'E2: 650', status: 'normal', hint: '(Normal - Late stim)' },
+    { label: 'E2: 1500', value: 'E2: 1500', status: 'high', hint: '(High - OHSS risk)' },
+    { label: 'P4: 0.8', value: 'P4: 0.8', status: 'normal', hint: '(Normal - Pre-trigger)' },
+    { label: 'P4: 2.5', value: 'P4: 2.5', status: 'high', hint: '(High - Early rise)' },
+    { label: 'FSH: 7', value: 'FSH: 7', status: 'normal', hint: '(Normal)' },
+    { label: 'FSH: 12', value: 'FSH: 12', status: 'high', hint: '(High - DOR concern)' },
+    { label: 'LH: 5', value: 'LH: 5', status: 'normal', hint: '(Normal)' },
+    { label: 'AMH: 2.5', value: 'AMH: 2.5', status: 'normal', hint: '(Good reserve)' },
   ],
   scan: [
-    { label: 'AFC: 12', value: 'AFC: 12 follicles' },
-    { label: 'Lining: 8mm', value: 'Endometrium: 8mm trilaminar' },
-    { label: 'Lead: 14mm', value: 'Lead follicle: 14mm' },
-    { label: '3-4 follicles', value: '3-4 follicles 12-14mm range' },
+    { label: 'AFC: 8', value: 'AFC: 8', status: 'normal', hint: '(Normal)' },
+    { label: 'AFC: 12', value: 'AFC: 12', status: 'normal', hint: '(Good)' },
+    { label: 'AFC: 18', value: 'AFC: 18', status: 'high', hint: '(High - PCOS?)' },
+    { label: 'AFC: 4', value: 'AFC: 4', status: 'low', hint: '(Low - DOR)' },
+    { label: 'Lining: 6mm', value: 'Lining: 6mm', status: 'low', hint: '(Thin)' },
+    { label: 'Lining: 8mm', value: 'Lining: 8mm trilaminar', status: 'normal', hint: '(Optimal)' },
+    { label: 'Lining: 10mm', value: 'Lining: 10mm trilaminar', status: 'normal', hint: '(Excellent)' },
+    { label: 'Lead: 12mm', value: 'Lead follicle: 12mm', status: 'normal', hint: '(Growing)' },
+    { label: 'Lead: 18mm', value: 'Lead follicle: 18mm', status: 'normal', hint: '(Mature)' },
+    { label: '2-3 follicles', value: '2-3 follicles 14-16mm', status: 'normal', hint: '(Low response)' },
+    { label: '5-7 follicles', value: '5-7 follicles 14-18mm', status: 'normal', hint: '(Good response)' },
+    { label: '12+ follicles', value: '12+ follicles >14mm', status: 'high', hint: '(High - OHSS risk)' },
   ],
   medication: [
-    { label: '75 IU', value: 'Dose: 75 IU' },
-    { label: '150 IU', value: 'Dose: 150 IU' },
-    { label: '225 IU', value: 'Dose: 225 IU' },
-    { label: 'Continue', value: 'Continue current dose' },
-    { label: 'Adjust ↑', value: 'Increase dose by 25%' },
+    { label: '75 IU', value: 'Dose: 75 IU daily', hint: '(Low dose)' },
+    { label: '150 IU', value: 'Dose: 150 IU daily', hint: '(Standard)' },
+    { label: '225 IU', value: 'Dose: 225 IU daily', hint: '(High dose)' },
+    { label: '300 IU', value: 'Dose: 300 IU daily', hint: '(Very high - Poor responder)' },
+    { label: 'Continue', value: 'Continue current dose', hint: '(No change)' },
+    { label: 'Reduce ↓', value: 'Reduce dose by 25%', hint: '(OHSS prevention)' },
+    { label: 'Increase ↑', value: 'Increase dose by 25%', hint: '(Slow response)' },
+    { label: 'Trigger', value: 'Trigger planned - hCG 5000 IU', hint: '(Ready for OPU)' },
   ],
   embryo: [
-    { label: '2PN', value: '2PN (normal fertilization)' },
-    { label: '8-cell', value: '8-cell, grade A' },
-    { label: 'Morula', value: 'Morula stage, good quality' },
-    { label: 'Blastocyst', value: 'Blastocyst 4AA' },
+    { label: '2PN', value: '2PN (normal fertilization)', hint: '(Day 1)' },
+    { label: '4-cell', value: '4-cell, grade A', hint: '(Day 2 - Good)' },
+    { label: '8-cell', value: '8-cell, grade A', hint: '(Day 3 - Excellent)' },
+    { label: 'Morula', value: 'Morula, good quality', hint: '(Day 4)' },
+    { label: 'Early Blast', value: 'Early blastocyst 3BB', hint: '(Day 5 - Good)' },
+    { label: 'Blast 4AA', value: 'Blastocyst 4AA', hint: '(Day 5 - Top quality)' },
+    { label: 'Blast 5AB', value: 'Expanded blast 5AB', hint: '(Day 6 - Excellent)' },
+    { label: 'Arrested', value: 'Development arrested', hint: '(Stopped growing)' },
   ],
 };
 
@@ -107,22 +148,49 @@ export default function AddEventModal({ isOpen, onClose, patient, cycleId, onSuc
     }
   }, [clinicalNotes]);
 
-  // Auto-generate summary from clinical notes
+  // Auto-generate summary from clinical notes (NOW AUTO-FILLS)
   const autoGenerateSummary = (notes, type) => {
-    if (!notes.trim() || summaryText) return; // Don't override manual entry
+    if (!notes.trim()) return;
     
     const eventLabel = EVENT_TYPES.find(e => e.value === type)?.label || 'Update';
     
-    // Smart summary generation based on notes
+    // Smart summary generation based on clinical content
     let summary = '';
-    if (notes.includes('E2:') || notes.includes('AFC:')) {
-      summary = `${eventLabel}: ${notes.split('\n')[0].slice(0, 60)}...`;
-    } else if (notes.includes('PN')) {
-      summary = `Fertilization update - ${notes.split('\n')[0]}`;
-    } else if (notes.includes('follicle')) {
-      summary = `Follicle development observed`;
+    
+    // Extract key values
+    const e2Match = notes.match(/E2:\s*(\d+)/);
+    const afcMatch = notes.match(/AFC:\s*(\d+)/);
+    const liningMatch = notes.match(/Lining:\s*(\d+)/);
+    const follicleMatch = notes.match(/(\d+)[-+]?\s*follicles?/);
+    const pnMatch = notes.match(/(\d+)PN/);
+    const blastMatch = notes.match(/[Bb]lastocyst\s*([0-9AB]+)/);
+    
+    // Generate contextual summary
+    if (type.includes('monitoring_scan')) {
+      const parts = [];
+      if (e2Match) parts.push(`E2: ${e2Match[1]}`);
+      if (afcMatch) parts.push(`${afcMatch[1]} follicles`);
+      if (liningMatch) parts.push(`${liningMatch[1]}mm lining`);
+      if (follicleMatch) parts.push(`${follicleMatch[1]} growing`);
+      summary = parts.length > 0 ? `${eventLabel}: ${parts.join(', ')}` : `${eventLabel} - scan completed`;
+    } else if (type.includes('fertilization')) {
+      if (pnMatch) {
+        summary = `${pnMatch[1]}PN fertilization - Day 1 report`;
+      } else {
+        summary = `Fertilization report - ${notes.split('\n')[0].slice(0, 50)}`;
+      }
+    } else if (type.includes('embryo')) {
+      if (blastMatch) {
+        summary = `Embryo update: Blastocyst ${blastMatch[1]}`;
+      } else {
+        summary = `${eventLabel} - ${notes.split('\n')[0].slice(0, 50)}`;
+      }
+    } else if (type.includes('dose')) {
+      summary = `Medication adjusted - ${notes.split('\n')[0].slice(0, 60)}`;
     } else {
-      summary = `${eventLabel} - ${notes.slice(0, 50)}...`;
+      // Default: use first line
+      const firstLine = notes.split('\n')[0].trim();
+      summary = firstLine.length > 60 ? `${eventLabel}: ${firstLine.slice(0, 60)}...` : `${eventLabel}: ${firstLine}`;
     }
     
     setSummaryText(summary);
@@ -335,23 +403,33 @@ export default function AddEventModal({ isOpen, onClose, patient, cycleId, onSuc
                 </div>
               </div>
 
-              {/* Quick Value Buttons */}
+              {/* Quick Value Buttons WITH RANGE INDICATORS */}
               {eventType && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                   <label className="block text-xs font-semibold text-blue-900 uppercase tracking-wide mb-2">
-                    ⚡ Quick Add (Click to insert)
+                    ⚡ Quick Add - Click to insert (color-coded: 🟢 Normal • 🔴 High • 🔵 Low)
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {QUICK_VALUES[getQuickValuesCategory()].map((item, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => addQuickValue(item.value)}
-                        className="px-3 py-1.5 text-sm bg-white border border-blue-300 rounded-md hover:bg-blue-100 hover:border-blue-400 transition font-medium text-blue-700"
-                      >
-                        {item.label}
-                      </button>
-                    ))}
+                    {QUICK_VALUES[getQuickValuesCategory()].map((item, idx) => {
+                      const statusColors = {
+                        normal: 'bg-green-100 border-green-400 text-green-800 hover:bg-green-200',
+                        high: 'bg-red-100 border-red-400 text-red-800 hover:bg-red-200',
+                        low: 'bg-blue-100 border-blue-400 text-blue-800 hover:bg-blue-200',
+                      };
+                      const colorClass = item.status ? statusColors[item.status] : 'bg-white border-gray-300 hover:bg-gray-100';
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => addQuickValue(item.value)}
+                          className={`px-3 py-1.5 text-sm border rounded-md transition font-medium ${colorClass}`}
+                          title={item.hint}
+                        >
+                          {item.label}
+                          {item.hint && <span className="ml-1 text-xs opacity-75">{item.hint}</span>}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -367,12 +445,19 @@ export default function AddEventModal({ isOpen, onClose, patient, cycleId, onSuc
                 <textarea
                   value={clinicalNotes}
                   onChange={(e) => setClinicalNotes(e.target.value)}
-                  placeholder="Type acronyms or click Quick Add buttons above&#10;Example: E2: 450, AFC: 12, Lead follicle: 14mm"
+                  placeholder="📝 EXAMPLES:&#10;Scan: E2: 450, AFC: 12, Lead follicle: 18mm, Lining: 8mm trilaminar&#10;Fertilization: 10 MII, 8 fertilized (2PN), ICSI done&#10;Embryo: Day 5 - 3 blastocysts (4AA, 4AB, 3BB)&#10;Medication: Dose: 150 IU - continue for 3 more days&#10;&#10;✨ Pro tip: Use Quick Add buttons above or type freely!"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
-                  rows="3"
+                  rows="4"
                 />
-                <div className="mt-1 text-xs text-gray-500">
-                  💬 Tip: Acronyms (E2, FSH, AFC, 2PN, MII, etc.) will expand automatically
+                <div className="mt-2 p-2 bg-gray-50 rounded border border-gray-200">
+                  <div className="text-xs text-gray-700 font-semibold mb-1">📚 Quick Reference Ranges:</div>
+                  <div className="text-xs text-gray-600 space-y-0.5">
+                    <div>• <strong>E2:</strong> 200-1000 pg/mL (normal), &lt;200 (low), &gt;1000 (high/OHSS risk)</div>
+                    <div>• <strong>P4:</strong> &lt;1 ng/mL (pre-trigger), &gt;2 (early rise concern)</div>
+                    <div>• <strong>AFC:</strong> 5-15 (normal), &lt;5 (DOR), &gt;15 (PCOS/high responder)</div>
+                    <div>• <strong>Lining:</strong> 7-14mm (optimal), &gt;8mm trilaminar (ideal for transfer)</div>
+                    <div>• <strong>Follicles:</strong> 5-10 mature (good), &lt;3 (low response), &gt;15 (OHSS risk)</div>
+                  </div>
                 </div>
               </div>
 
