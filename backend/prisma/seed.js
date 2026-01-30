@@ -1,25 +1,38 @@
 import { PrismaClient } from '@prisma/client';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Starting database seed...');
 
-  // Create demo clinic
-  const clinic = await prisma.clinic.create({
-    data: {
-      name: 'Santaan Demo Clinic',
-      domain: 'demo',
-      licenseKey: 'DEMO-LICENSE-KEY',
-      licenseExpiresAt: new Date('2027-12-31'),
-      settings: {
-        timezone: 'Asia/Kolkata',
-        defaultLanguage: 'hindi_english',
-      },
-    },
+  // Get or create demo clinic
+  let clinic = await prisma.clinic.findUnique({
+    where: { domain: 'demo' }
   });
 
-  console.log('✅ Created demo clinic');
+  if (!clinic) {
+    clinic = await prisma.clinic.create({
+      data: {
+        name: 'Santaan Demo Clinic',
+        domain: 'demo',
+        licenseKey: 'DEMO-LICENSE-KEY',
+        licenseExpiresAt: new Date('2027-12-31'),
+        settings: {
+          timezone: 'Asia/Kolkata',
+          defaultLanguage: 'hindi_english',
+        },
+      },
+    });
+    console.log('✅ Created demo clinic');
+  } else {
+    console.log('✅ Using existing demo clinic');
+  }
 
   // Create users
   const admin = await prisma.user.create({
@@ -94,53 +107,65 @@ async function main() {
 
   console.log('✅ Seeded acronym dictionary');
 
-  // Seed templates
-  const templates = [
-    {
-      name: 'Welcome - Initial Consultation',
-      eventType: 'initial_consultation',
-      category: 'message',
-      language: 'hindi_english',
-      content: 'Namaste {{patient_name}} ji! 🙏\n\nSantaan में आपका स्वागत है। Aaj aapki consultation Dr. {{doctor_name}} ke saath hui. Aapki journey ab shuru ho rahi hai aur hum har kadam par aapke saath hain.\n\nNext steps:\n{{next_steps}}\n\nKoi bhi sawaal ho toh please reply karein! 💚',
-      talkingPoints: ['Welcome patient warmly', 'Explain clinic process', 'Set expectations for timeline', 'Answer initial questions', 'Emphasize support availability'],
-      suggestedVisuals: [],
-      triggerConditions: { eventType: 'initial_consultation' },
-    },
-    {
-      name: 'Scan Results - Day 5 Monitoring',
-      eventType: 'monitoring_scan_day5',
-      category: 'message',
-      language: 'hindi_english',
-      content: '{{patient_name}} ji, aaj aapka scan bahut achha tha! ✨\n\nFollicles achhe se badh rahe hain:\n- Left ovary: {{follicles_left}} follicles (largest {{max_left}}mm)\n- Right ovary: {{follicles_right}} follicles (largest {{max_right}}mm)\n\n{{#if dose_change}}Ek chhoti si adjustment: {{medication_name}} ab {{new_dose}} hogi (pehle {{old_dose}} thi). Yeh normal hai taaki best results aaye.{{/if}}\n\nNext scan: {{next_scan_date}} at {{next_scan_time}}\n\nQuestions? Reply kariye! 💚',
-      talkingPoints: ['Scan results are positive - follicles growing well', 'Explain current sizes and target (18-20mm)', 'If dose changed, emphasize it\'s normal optimization', 'Confirm next appointment', 'Ask if patient has any concerns'],
-      suggestedVisuals: ['follicle_growth_chart', 'timeline_progress'],
-      triggerConditions: { eventType: 'monitoring_scan_day5' },
-    },
-    {
-      name: 'Fertilization Report - Day 1',
-      eventType: 'fertilization_day1_report',
-      category: 'message',
-      language: 'hindi_english',
-      content: '{{patient_name}} ji, good news! 🎉\n\nAaj ka fertilization report:\n- Total eggs: {{total_eggs}}\n- Mature eggs (MII): {{mature_eggs}}\n- Fertilized normally (2PN): {{fertilized}}/{{mature_eggs}}\n\nSaare {{fertilized}} embryos achhe se develop ho rahe hain. Hum Day 3 par inhe phir check karenge aur aapko update denge.\n\nYeh bahut achhi progress hai! 💚',
-      talkingPoints: ['Congratulate on fertilization', 'Explain what 2PN means (normal fertilization)', 'Set expectations for Day 3 update', 'Reassure patient', 'Invite questions'],
-      suggestedVisuals: ['fertilization_process', 'embryo_timeline'],
-      triggerConditions: { eventType: 'fertilization_day1_report' },
-    },
-    {
-      name: 'Embryo Transfer - Pre-procedure',
-      eventType: 'embryo_transfer_prep',
-      category: 'message',
-      language: 'hindi_english',
-      content: '{{patient_name}} ji,\n\nKal aapka embryo transfer hai! 🌟\n\nImportant instructions:\n✅ Light breakfast le sakte hain\n✅ Water peete rahein (bladder full hona chahiye)\n✅ Comfortable kapde pehne\n✅ {{partner_name}} ke saath aa sakte hain\n\nTime: {{transfer_time}}\nProcedure duration: 15-20 minutes only\n\nGhabraiye mat, yeh bilkul painless hai! See you tomorrow! 💚',
-      talkingPoints: ['Confirm appointment time', 'Explain procedure briefly', 'Reassure it\'s painless', 'Confirm companion allowed', 'Address any last-minute concerns'],
-      suggestedVisuals: ['transfer_procedure', 'dos_and_donts'],
-      triggerConditions: { eventType: 'embryo_transfer_prep' },
-    },
-  ];
-
-  await prisma.template.createMany({
-    data: templates,
-  });
+  // Seed templates from JSON files
+  console.log('📚 Loading templates from JSON files...');
+  
+  const seedsDir = path.join(__dirname, 'seeds');
+  const templateFiles = fs.readdirSync(seedsDir)
+    .filter(file => file.startsWith('templates_') && file.endsWith('.json') && !file.includes('odia'));
+  
+  let allTemplates = [];
+  
+  for (const file of templateFiles) {
+    const filePath = path.join(seedsDir, file);
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    const templates = JSON.parse(fileContent);
+    
+    // Transform JSON template format to Prisma schema format
+    const transformedTemplates = templates
+      .filter(t => t.language === 'english' || t.language === 'hinglish') // English-only for now
+      .map(template => ({
+        clinicId: clinic.id,
+        name: template.eventName,
+        eventType: template.eventName.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
+        category: 'communication',
+        language: template.language,
+        content: [
+          template.greeting,
+          template.context,
+          template.explanation,
+          template.next_steps,
+          template.reassurance,
+          template.call_to_action,
+          template.contact_info
+        ].filter(Boolean).join('\n\n'),
+        talkingPoints: [
+          template.context,
+          template.explanation,
+          template.reassurance
+        ].filter(Boolean),
+        suggestedVisuals: [],
+        triggerConditions: {
+          eventType: template.eventName,
+          channel: template.channel
+        },
+      }));
+    
+    allTemplates.push(...transformedTemplates);
+  }
+  
+  console.log(`📊 Found ${allTemplates.length} English templates across ${templateFiles.length} files`);
+  
+  // Insert templates in batches to avoid memory issues
+  const batchSize = 50;
+  for (let i = 0; i < allTemplates.length; i += batchSize) {
+    const batch = allTemplates.slice(i, i + batchSize);
+    await prisma.template.createMany({
+      data: batch,
+      skipDuplicates: true,
+    });
+    console.log(`   ✅ Inserted batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(allTemplates.length / batchSize)}`);
+  }
 
   console.log('✅ Seeded message templates');
 
