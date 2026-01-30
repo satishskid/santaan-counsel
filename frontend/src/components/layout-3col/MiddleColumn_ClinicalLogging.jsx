@@ -1,66 +1,58 @@
 import { useState } from 'react';
-import { Stethoscope, Plus } from 'lucide-react';
-
-const SOAP_SECTIONS = ['Subjective', 'Objective', 'Assessment', 'Plan'];
+import { Stethoscope, Plus, Trash2 } from 'lucide-react';
 
 const META_PROMPTS = {
   Subjective: [
-    { emoji: '😊', label: 'Feeling Good', text: 'Patient reports feeling well with no discomfort' },
-    { emoji: '😰', label: 'Anxious', text: 'Patient expressing anxiety about treatment progress' },
-    { emoji: '🤕', label: 'Pain/Discomfort', text: 'Patient reports mild abdominal discomfort' },
-    { emoji: '💊', label: 'Medication Adherence', text: 'Patient confirms medication taken as prescribed' },
-    { emoji: '❓', label: 'Has Questions', text: 'Patient has questions about next steps' },
+    { emoji: '😊', label: 'Feeling Good', text: 'Patient reports feeling well with no discomfort.' },
+    { emoji: '😰', label: 'Anxious', text: 'Patient expressing anxiety about treatment progress.' },
+    { emoji: '🤕', label: 'Pain/Discomfort', text: 'Patient reports mild abdominal discomfort.' },
+    { emoji: '💊', label: 'Medication Adherence', text: 'Patient confirms medication taken as prescribed.' },
+    { emoji: '❓', label: 'Has Questions', text: 'Patient has questions about next steps.' },
   ],
   Objective: [
-    { emoji: '🔬', label: 'Normal Scan', text: 'E2: [value] pg/mL | [n] follicles ([size]mm) | Lining: [value]mm' },
-    { emoji: '📊', label: 'Good Response', text: 'Good ovarian response with [n] growing follicles' },
-    { emoji: '⚠️', label: 'Slow Response', text: 'Slower than expected response, [n] follicles' },
-    { emoji: '💉', label: 'Blood Work', text: 'E2: [value] | LH: [value] | P4: [value]' },
-    { emoji: '🥚', label: 'Egg Count', text: 'Retrieved [n] eggs, [n] mature (MII)' },
+    { emoji: '🔬', label: 'Normal Scan', text: 'E2: [value] pg/mL, [n] follicles ([size]mm), Lining: [value]mm.' },
+    { emoji: '📊', label: 'Good Response', text: 'Good ovarian response with [n] growing follicles.' },
+    { emoji: '⚠️', label: 'Slow Response', text: 'Slower than expected response, [n] follicles observed.' },
+    { emoji: '💉', label: 'Blood Work', text: 'E2: [value], LH: [value], P4: [value].' },
+    { emoji: '🥚', label: 'Egg Count', text: 'Retrieved [n] eggs, [n] mature (MII).' },
   ],
   Assessment: [
-    { emoji: '✅', label: 'On Track', text: 'Cycle progressing as expected' },
-    { emoji: '📈', label: 'Good Progress', text: 'Excellent follicular development, ready for next phase' },
-    { emoji: '⏸️', label: 'Need to Wait', text: 'Need more time for follicles to mature' },
-    { emoji: '🔄', label: 'Adjust Meds', text: 'Plan to adjust medication dosage' },
-    { emoji: '🎯', label: 'Ready for Trigger', text: 'Follicles ready, trigger shot tonight' },
+    { emoji: '✅', label: 'On Track', text: 'Cycle progressing as expected.' },
+    { emoji: '📈', label: 'Good Progress', text: 'Excellent follicular development, ready for next phase.' },
+    { emoji: '⏸️', label: 'Need to Wait', text: 'Need more time for follicles to mature.' },
+    { emoji: '🔄', label: 'Adjust Meds', text: 'Plan to adjust medication dosage.' },
+    { emoji: '🎯', label: 'Ready for Trigger', text: 'Follicles ready, trigger shot tonight.' },
   ],
   Plan: [
-    { emoji: '📅', label: 'Next Scan', text: 'Continue current medications. Next scan in 2-3 days' },
-    { emoji: '💉', label: 'Trigger Tonight', text: 'Trigger shot tonight at [time]. OPU scheduled for [date]' },
-    { emoji: '🏥', label: 'OPU Scheduled', text: 'OPU scheduled for [date] at [time]. NPO after midnight' },
-    { emoji: '🧬', label: 'Await Embryo Report', text: 'Await fertilization report. Transfer planned for Day [n]' },
-    { emoji: '📞', label: 'Follow-up Call', text: 'Nurse to call patient with updates' },
+    { emoji: '📅', label: 'Next Scan', text: 'Continue current medications, next scan in 2-3 days.' },
+    { emoji: '💉', label: 'Trigger Tonight', text: 'Trigger shot tonight at [time], OPU scheduled for [date].' },
+    { emoji: '🏥', label: 'OPU Scheduled', text: 'OPU scheduled for [date] at [time], NPO after midnight.' },
+    { emoji: '🧬', label: 'Await Embryo Report', text: 'Await fertilization report, transfer planned for Day [n].' },
+    { emoji: '📞', label: 'Follow-up Call', text: 'Nurse to call patient with updates.' },
   ],
 };
 
 export default function MiddleColumn_ClinicalLogging({ patientId, activeCycle, onEventCreated }) {
-  const [soapNote, setSoapNote] = useState({
-    subjective: '',
-    objective: '',
-    assessment: '',
-    plan: '',
-  });
-  const [activeSection, setActiveSection] = useState('Objective');
+  const [clinicalNote, setClinicalNote] = useState('');
   const [generating, setGenerating] = useState(false);
 
-  const addChipToSection = (section, text) => {
-    const sectionKey = section.toLowerCase();
-    const currentText = soapNote[sectionKey];
-    const newText = currentText ? `${currentText}\n• ${text}` : `• ${text}`;
-    setSoapNote({ ...soapNote, [sectionKey]: newText });
+  const addChipText = (text) => {
+    const newNote = clinicalNote ? `${clinicalNote} ${text}` : text;
+    setClinicalNote(newNote);
+  };
+
+  const clearNote = () => {
+    setClinicalNote('');
   };
 
   const generateEvent = async () => {
-    if (!soapNote.objective && !soapNote.assessment) {
-      alert('Please add at least Objective and Assessment notes');
+    if (!clinicalNote.trim()) {
+      alert('Please add clinical notes by clicking chips or typing');
       return;
     }
 
     setGenerating(true);
     try {
-      const clinicalNote = `SUBJECTIVE:\n${soapNote.subjective || 'N/A'}\n\nOBJECTIVE:\n${soapNote.objective}\n\nASSESSMENT:\n${soapNote.assessment}\n\nPLAN:\n${soapNote.plan || 'N/A'}`;
-      
       const response = await fetch('http://localhost:3000/api/timeline-events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -69,8 +61,8 @@ export default function MiddleColumn_ClinicalLogging({ patientId, activeCycle, o
           eventType: 'monitoring_scan', // Auto-detect based on content
           eventDate: new Date().toISOString(),
           cycleDay: activeCycle?.cycleDay || null,
-          patientRecordText: soapNote.objective,
-          summaryText: soapNote.assessment,
+          patientRecordText: clinicalNote,
+          summaryText: clinicalNote.substring(0, 200), // First 200 chars as summary
           soapNote: clinicalNote,
         }),
       });
@@ -78,13 +70,7 @@ export default function MiddleColumn_ClinicalLogging({ patientId, activeCycle, o
       if (response.ok) {
         const event = await response.json();
         onEventCreated(event);
-        // Reset form
-        setSoapNote({
-          subjective: '',
-          objective: '',
-          assessment: '',
-          plan: '',
-        });
+        setClinicalNote(''); // Reset
       }
     } catch (error) {
       console.error('Failed to create event:', error);
@@ -106,94 +92,157 @@ export default function MiddleColumn_ClinicalLogging({ patientId, activeCycle, o
                 Clinical Note
               </h2>
               <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                SOAP format with meta-prompt chips
+                Click chips to build note paragraph
               </p>
             </div>
           </div>
         </div>
 
-        {/* SOAP Section Tabs */}
-        <div className="flex gap-2 border-b pb-2" style={{ borderColor: 'var(--border-light)' }}>
-          {SOAP_SECTIONS.map(section => (
-            <button
-              key={section}
-              onClick={() => setActiveSection(section)}
-              className="px-4 py-2 rounded-t-lg text-sm font-medium transition-colors"
-              style={{
-                background: activeSection === section ? 'var(--accent-action)' : 'transparent',
-                color: activeSection === section ? 'white' : 'var(--text-secondary)',
-              }}
-            >
-              {section}
-            </button>
-          ))}
-        </div>
+        {/* All Meta Prompt Chips - Organized by SOAP */}
+        <div className="claude-card p-5 space-y-4">
+          {/* Subjective Chips */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: 'var(--text-tertiary)' }}>
+              💭 Subjective (Patient Says)
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {META_PROMPTS.Subjective.map((chip, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => addChipText(chip.text)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all hover:scale-105"
+                  style={{
+                    background: 'var(--bg-subtle)',
+                    border: '1px solid var(--border-medium)',
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  <span>{chip.emoji}</span>
+                  <span>{chip.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
 
-        {/* Meta Prompt Chips */}
-        <div className="claude-card p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide mb-3" style={{ color: 'var(--text-tertiary)' }}>
-            Quick Add Chips:
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {META_PROMPTS[activeSection]?.map((chip, idx) => (
-              <button
-                key={idx}
-                onClick={() => addChipToSection(activeSection, chip.text)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all hover:scale-105"
-                style={{
-                  background: 'var(--bg-subtle)',
-                  border: '1px solid var(--border-medium)',
-                  color: 'var(--text-primary)',
-                }}
-              >
-                <span>{chip.emoji}</span>
-                <span>{chip.label}</span>
-              </button>
-            ))}
+          {/* Objective Chips */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: 'var(--text-tertiary)' }}>
+              🔬 Objective (Clinical Findings)
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {META_PROMPTS.Objective.map((chip, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => addChipText(chip.text)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all hover:scale-105"
+                  style={{
+                    background: 'var(--bg-subtle)',
+                    border: '1px solid var(--border-medium)',
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  <span>{chip.emoji}</span>
+                  <span>{chip.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Assessment Chips */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: 'var(--text-tertiary)' }}>
+              📊 Assessment (Clinical Judgment)
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {META_PROMPTS.Assessment.map((chip, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => addChipText(chip.text)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all hover:scale-105"
+                  style={{
+                    background: 'var(--bg-subtle)',
+                    border: '1px solid var(--border-medium)',
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  <span>{chip.emoji}</span>
+                  <span>{chip.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Plan Chips */}
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: 'var(--text-tertiary)' }}>
+              📋 Plan (Next Steps)
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {META_PROMPTS.Plan.map((chip, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => addChipText(chip.text)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all hover:scale-105"
+                  style={{
+                    background: 'var(--bg-subtle)',
+                    border: '1px solid var(--border-medium)',
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  <span>{chip.emoji}</span>
+                  <span>{chip.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* SOAP Note Editor */}
-        <div className="space-y-4">
-          {SOAP_SECTIONS.map(section => (
-            <div key={section} className="claude-card p-4">
-              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                {section}
-                {['Objective', 'Assessment'].includes(section) && (
-                  <span className="text-red-500 ml-1">*</span>
-                )}
-              </label>
-              <textarea
-                value={soapNote[section.toLowerCase()]}
-                onChange={(e) => setSoapNote({ 
-                  ...soapNote, 
-                  [section.toLowerCase()]: e.target.value 
-                })}
-                placeholder={`Click chips above to add ${section.toLowerCase()} notes, or type manually...`}
-                rows={6}
-                className="w-full px-3 py-2 border rounded-lg text-sm"
-                style={{ 
-                  borderColor: 'var(--border-medium)',
-                  fontFamily: 'monospace',
-                  lineHeight: 'var(--leading-relaxed)'
+        {/* Single Clinical Note Editor */}
+        <div className="claude-card p-4">
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+              Clinical Note Paragraph
+            </label>
+            {clinicalNote && (
+              <button
+                onClick={clearNote}
+                className="flex items-center gap-1 px-2 py-1 rounded text-xs"
+                style={{
+                  background: 'var(--bg-subtle)',
+                  color: 'var(--text-secondary)'
                 }}
-              />
-            </div>
-          ))}
+              >
+                <Trash2 className="w-3 h-3" />
+                Clear
+              </button>
+            )}
+          </div>
+          <textarea
+            value={clinicalNote}
+            onChange={(e) => setClinicalNote(e.target.value)}
+            placeholder="Click chips above to build clinical note, or type manually..."
+            rows={12}
+            className="w-full px-4 py-3 border rounded-lg text-sm"
+            style={{ 
+              borderColor: 'var(--border-medium)',
+              fontFamily: 'system-ui',
+              lineHeight: 'var(--leading-relaxed)'
+            }}
+          />
         </div>
 
         {/* Generate Event Button */}
         <div className="sticky bottom-0 pt-4" style={{ background: 'var(--bg-canvas)' }}>
           <button
             onClick={generateEvent}
-            disabled={generating || (!soapNote.objective && !soapNote.assessment)}
+            disabled={generating || !clinicalNote.trim()}
             className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-base transition-colors"
             style={{
-              background: generating || (!soapNote.objective && !soapNote.assessment) 
+              background: generating || !clinicalNote.trim()
                 ? 'var(--text-disabled)' 
                 : 'var(--accent-success)',
               color: 'white',
-              cursor: generating || (!soapNote.objective && !soapNote.assessment) ? 'not-allowed' : 'pointer'
+              cursor: generating || !clinicalNote.trim() ? 'not-allowed' : 'pointer'
             }}
           >
             <Plus className="w-5 h-5" />
