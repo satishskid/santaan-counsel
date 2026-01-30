@@ -3,6 +3,7 @@ import { useAuthStore } from './store/authStore';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import PatientView from './pages/PatientView';
+import PatientViewV2 from './pages/PatientViewV2';
 import './index.css';
 
 function PrivateRoute({ children }) {
@@ -32,6 +33,15 @@ function App() {
         
         <Route
           path="/patients/:id"
+          element={
+            <PrivateRoute>
+              <PatientViewV2 />
+            </PrivateRoute>
+          }
+        />
+        
+        <Route
+          path="/patients-old/:id"
           element={
             <PrivateRoute>
               <PatientView />

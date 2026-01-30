@@ -1,0 +1,161 @@
+/* Claude-Inspired Theme for Santaan IVF */
+
+:root {
+  /* Base Colors - Almost Monochrome */
+  --bg-canvas: #FAFAF8;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #F5F5F3;
+  --bg-hover: #F0F0EE;
+  
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --text-disabled: #CCCCCC;
+  
+  --border-light: #E8E8E6;
+  --border-medium: #D4D4D0;
+  
+  /* Minimal Accent Colors */
+  --accent-action: #2D6FDB;
+  --accent-action-hover: #1E5BBF;
+  --accent-success: #2E7D5F;
+  --accent-warning: #C17D4A;
+  
+  /* Status Indicators - Subtle */
+  --mood-calm: #E8F4E8;
+  --mood-neutral: #F5F5F3;
+  --mood-anxious: #FFF4E6;
+  
+  /* Shadows - Soft and Subtle */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+  
+  /* Spacing System */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  
+  /* Typography */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 0.9375rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  
+  --leading-tight: 1.3;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.8;
+  
+  --tracking-tight: -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.02em;
+}
+
+/* Global Resets */
+* {
+  font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background-color: var(--bg-canvas);
+}
+
+/* Utility Classes */
+.claude-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 200ms ease;
+}
+
+.claude-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.claude-divider {
+  border: none;
+  height: 1px;
+  background: var(--border-light);
+  margin: var(--space-6) 0;
+}
+
+.claude-btn-primary {
+  background: var(--accent-action);
+  color: white;
+  border: none;
+  padding: var(--space-2) var(--space-4);
+  border-radius: 8px;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.claude-btn-primary:hover {
+  background: var(--accent-action-hover);
+}
+
+.claude-btn-secondary {
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  border: 1px solid var(--border-medium);
+  padding: var(--space-2) var(--space-4);
+  border-radius: 8px;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.claude-btn-secondary:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-medium);
+}
+
+.claude-text-primary {
+  color: var(--text-primary);
+}
+
+.claude-text-secondary {
+  color: var(--text-secondary);
+}
+
+.claude-text-tertiary {
+  color: var(--text-tertiary);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-subtle);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
