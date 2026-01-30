@@ -1,0 +1,24 @@
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/YOUR_USERNAME/santaan-ivf)
+
+{
+  "build": {
+    "command": "npm run build:all",
+    "publish": "frontend/dist",
+    "functions": "netlify/functions",
+    "environment": {
+      "NODE_VERSION": "20"
+    }
+  },
+  "redirects": [
+    {
+      "from": "/api/*",
+      "to": "/.netlify/functions/api/:splat",
+      "status": 200
+    },
+    {
+      "from": "/*",
+      "to": "/index.html",
+      "status": 200
+    }
+  ]
+}
