@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import PatientView from './pages/PatientView';
 import PatientViewV2 from './pages/PatientViewV2';
+import PatientView3Col from './pages/PatientView3Col';
 import './index.css';
 
 function PrivateRoute({ children }) {
@@ -33,6 +34,15 @@ function App() {
         
         <Route
           path="/patients/:id"
+          element={
+            <PrivateRoute>
+              <PatientView3Col />
+            </PrivateRoute>
+          }
+        />
+        
+        <Route
+          path="/patients-v2/:id"
           element={
             <PrivateRoute>
               <PatientViewV2 />
