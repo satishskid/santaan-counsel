@@ -1,0 +1,522 @@
+[
+  {
+    "name": "Initial Consultation",
+    "category": "pre_cycle",
+    "pathway": "all",
+    "typicalDay": 0,
+    "icon": "👋",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "medium"
+  },
+  {
+    "name": "Medical History Review",
+    "category": "pre_cycle",
+    "pathway": "all",
+    "typicalDay": 0,
+    "icon": "📋",
+    "requiresClinical": true,
+    "requiresReaction": false,
+    "anxietySensitivity": "low"
+  },
+  {
+    "name": "Baseline Blood Tests",
+    "category": "pre_cycle",
+    "pathway": "all",
+    "typicalDay": -7,
+    "icon": "🩸",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "high"
+  },
+  {
+    "name": "AMH Test Result",
+    "category": "pre_cycle",
+    "pathway": "all",
+    "typicalDay": -5,
+    "icon": "📊",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "Baseline Ultrasound AFC",
+    "category": "pre_cycle",
+    "pathway": "all",
+    "typicalDay": -3,
+    "icon": "🔬",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "high"
+  },
+  {
+    "name": "Semen Analysis",
+    "category": "pre_cycle",
+    "pathway": "all",
+    "typicalDay": -7,
+    "icon": "🧪",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "Financial Counseling",
+    "category": "administrative",
+    "pathway": "all",
+    "typicalDay": -3,
+    "icon": "💰",
+    "requiresClinical": false,
+    "requiresReaction": true,
+    "anxietySensitivity": "high"
+  },
+  {
+    "name": "Medication Teaching",
+    "category": "pre_cycle",
+    "pathway": "all",
+    "typicalDay": -1,
+    "icon": "💉",
+    "requiresClinical": false,
+    "requiresReaction": true,
+    "anxietySensitivity": "medium"
+  },
+  {
+    "name": "Consent Signing",
+    "category": "administrative",
+    "pathway": "all",
+    "typicalDay": 0,
+    "icon": "📝",
+    "requiresClinical": false,
+    "requiresReaction": false,
+    "anxietySensitivity": "medium"
+  },
+  {
+    "name": "Cycle Day 1 Baseline Scan",
+    "category": "stimulation",
+    "pathway": "fresh_ivf",
+    "typicalDay": 1,
+    "icon": "🔬",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "medium"
+  },
+  {
+    "name": "Stimulation Start Day 2",
+    "category": "stimulation",
+    "pathway": "fresh_ivf",
+    "typicalDay": 2,
+    "icon": "💊",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "high"
+  },
+  {
+    "name": "Monitoring Scan Day 3",
+    "category": "stimulation",
+    "pathway": "fresh_ivf",
+    "typicalDay": 3,
+    "icon": "📊",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "medium"
+  },
+  {
+    "name": "Monitoring Scan Day 5",
+    "category": "stimulation",
+    "pathway": "fresh_ivf",
+    "typicalDay": 5,
+    "icon": "📊",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "high"
+  },
+  {
+    "name": "Monitoring Scan Day 7",
+    "category": "stimulation",
+    "pathway": "fresh_ivf",
+    "typicalDay": 7,
+    "icon": "📊",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "high"
+  },
+  {
+    "name": "Monitoring Scan Day 9",
+    "category": "stimulation",
+    "pathway": "fresh_ivf",
+    "typicalDay": 9,
+    "icon": "📊",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "GnRH Antagonist Start",
+    "category": "stimulation",
+    "pathway": "fresh_ivf",
+    "typicalDay": 6,
+    "icon": "💉",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "medium"
+  },
+  {
+    "name": "Dose Increase",
+    "category": "stimulation",
+    "pathway": "fresh_ivf",
+    "typicalDay": null,
+    "icon": "⬆️",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "high"
+  },
+  {
+    "name": "Dose Decrease",
+    "category": "stimulation",
+    "pathway": "fresh_ivf",
+    "typicalDay": null,
+    "icon": "⬇️",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "medium"
+  },
+  {
+    "name": "Dose Maintained",
+    "category": "stimulation",
+    "pathway": "fresh_ivf",
+    "typicalDay": null,
+    "icon": "➡️",
+    "requiresClinical": true,
+    "requiresReaction": false,
+    "anxietySensitivity": "low"
+  },
+  {
+    "name": "Trigger Shot Scheduled",
+    "category": "retrieval",
+    "pathway": "fresh_ivf",
+    "typicalDay": 10,
+    "icon": "🎯",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "hCG Trigger",
+    "category": "retrieval",
+    "pathway": "fresh_ivf",
+    "typicalDay": 11,
+    "icon": "💉",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "high"
+  },
+  {
+    "name": "Dual Trigger (hCG + Lupron)",
+    "category": "retrieval",
+    "pathway": "fresh_ivf",
+    "typicalDay": 11,
+    "icon": "💉💉",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "high"
+  },
+  {
+    "name": "Pre-Retrieval Instructions",
+    "category": "retrieval",
+    "pathway": "fresh_ivf",
+    "typicalDay": 12,
+    "icon": "📋",
+    "requiresClinical": false,
+    "requiresReaction": false,
+    "anxietySensitivity": "medium"
+  },
+  {
+    "name": "Egg Retrieval Procedure",
+    "category": "retrieval",
+    "pathway": "fresh_ivf",
+    "typicalDay": 13,
+    "icon": "🥚",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "Oocyte Count Report",
+    "category": "lab",
+    "pathway": "fresh_ivf",
+    "typicalDay": 13,
+    "icon": "🔢",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "Maturity Breakdown (MII/MI/GV)",
+    "category": "lab",
+    "pathway": "fresh_ivf",
+    "typicalDay": 13,
+    "icon": "🧬",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "Fertilization Day 1 Report",
+    "category": "lab",
+    "pathway": "fresh_ivf",
+    "typicalDay": 14,
+    "icon": "🧬",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "Day 3 Cleavage Update",
+    "category": "lab",
+    "pathway": "fresh_ivf",
+    "typicalDay": 16,
+    "icon": "📊",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "Day 5 Blastocyst Report",
+    "category": "lab",
+    "pathway": "fresh_ivf",
+    "typicalDay": 18,
+    "icon": "🌟",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "Day 6 Blastocyst Report",
+    "category": "lab",
+    "pathway": "fresh_ivf",
+    "typicalDay": 19,
+    "icon": "🌟",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "high"
+  },
+  {
+    "name": "Embryo Transfer Day 3",
+    "category": "transfer",
+    "pathway": "fresh_ivf",
+    "typicalDay": 16,
+    "icon": "🌱",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "Embryo Transfer Day 5",
+    "category": "transfer",
+    "pathway": "fresh_ivf",
+    "typicalDay": 18,
+    "icon": "🌱",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "Freeze All Decision",
+    "category": "transfer",
+    "pathway": "fresh_ivf",
+    "typicalDay": 18,
+    "icon": "❄️",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "high"
+  },
+  {
+    "name": "Post-Transfer Instructions",
+    "category": "transfer",
+    "pathway": "all",
+    "typicalDay": null,
+    "icon": "📋",
+    "requiresClinical": false,
+    "requiresReaction": false,
+    "anxietySensitivity": "medium"
+  },
+  {
+    "name": "Beta hCG Test Day 10",
+    "category": "pregnancy",
+    "pathway": "all",
+    "typicalDay": 28,
+    "icon": "🩸",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "Positive Beta Result",
+    "category": "pregnancy",
+    "pathway": "all",
+    "typicalDay": 28,
+    "icon": "🎉",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "Negative Beta Result",
+    "category": "pregnancy",
+    "pathway": "all",
+    "typicalDay": 28,
+    "icon": "💔",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "Repeat Beta hCG (48h)",
+    "category": "pregnancy",
+    "pathway": "all",
+    "typicalDay": 30,
+    "icon": "🩸",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "First Ultrasound 6 Weeks",
+    "category": "pregnancy",
+    "pathway": "all",
+    "typicalDay": 42,
+    "icon": "🔬",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "Heartbeat Confirmed",
+    "category": "pregnancy",
+    "pathway": "all",
+    "typicalDay": 49,
+    "icon": "💓",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "FET Lining Check",
+    "category": "fet_prep",
+    "pathway": "fet",
+    "typicalDay": 12,
+    "icon": "📏",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "high"
+  },
+  {
+    "name": "Embryo Thaw Confirmation",
+    "category": "fet_transfer",
+    "pathway": "fet",
+    "typicalDay": 15,
+    "icon": "❄️➡️",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "Cycle Cancellation - Poor Response",
+    "category": "complication",
+    "pathway": "fresh_ivf",
+    "typicalDay": null,
+    "icon": "⚠️",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "OHSS Risk - Freeze All",
+    "category": "complication",
+    "pathway": "fresh_ivf",
+    "typicalDay": null,
+    "icon": "🛑",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "Total Fertilization Failure",
+    "category": "complication",
+    "pathway": "fresh_ivf",
+    "typicalDay": 14,
+    "icon": "❌",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "No Blastocyst Formation",
+    "category": "complication",
+    "pathway": "fresh_ivf",
+    "typicalDay": 18,
+    "icon": "❌",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "Patient Inquiry - General",
+    "category": "inquiry",
+    "pathway": "all",
+    "typicalDay": null,
+    "icon": "💬",
+    "requiresClinical": false,
+    "requiresReaction": true,
+    "anxietySensitivity": "medium"
+  },
+  {
+    "name": "Medication Side Effects Query",
+    "category": "inquiry",
+    "pathway": "all",
+    "typicalDay": null,
+    "icon": "💊❓",
+    "requiresClinical": false,
+    "requiresReaction": true,
+    "anxietySensitivity": "medium"
+  },
+  {
+    "name": "Counseling Session - Coping",
+    "category": "counseling",
+    "pathway": "all",
+    "typicalDay": null,
+    "icon": "🤝",
+    "requiresClinical": false,
+    "requiresReaction": true,
+    "anxietySensitivity": "high"
+  },
+  {
+    "name": "Post-Negative Counseling",
+    "category": "counseling",
+    "pathway": "all",
+    "typicalDay": null,
+    "icon": "💙",
+    "requiresClinical": false,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  },
+  {
+    "name": "PGT-A Biopsy Day 5",
+    "category": "lab",
+    "pathway": "pgt",
+    "typicalDay": 18,
+    "icon": "🧬",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "high"
+  },
+  {
+    "name": "PGT-A Results Received",
+    "category": "lab",
+    "pathway": "pgt",
+    "typicalDay": 28,
+    "icon": "📊",
+    "requiresClinical": true,
+    "requiresReaction": true,
+    "anxietySensitivity": "very_high"
+  }
+]
