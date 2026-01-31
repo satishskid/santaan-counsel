@@ -5,6 +5,8 @@ import {
   createPatient,
   updatePatient,
   getPatientTimeline,
+  searchPatients,
+  createWalkin,
 } from '../controllers/patients.controller.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { validate, schemas } from '../middleware/validation.js';
@@ -14,7 +16,9 @@ const router = express.Router();
 router.use(authMiddleware);
 
 router.get('/', getPatients);
+router.get('/search', searchPatients);
 router.post('/', validate(schemas.createPatient), createPatient);
+router.post('/walkin', createWalkin);
 router.get('/:id', getPatient);
 router.put('/:id', updatePatient);
 router.get('/:id/timeline', getPatientTimeline);

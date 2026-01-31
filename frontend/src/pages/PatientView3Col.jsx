@@ -18,6 +18,7 @@ export default function PatientView3Col() {
   const [activeCycle, setActiveCycle] = useState(null);
   const [latestEvent, setLatestEvent] = useState(null);
   const [templates, setTemplates] = useState([]);
+  const [liveActionCards, setLiveActionCards] = useState([]);
 
   useEffect(() => {
     fetchPatientData();
@@ -62,6 +63,11 @@ export default function PatientView3Col() {
   const handleEventCreated = async (event) => {
     await fetchPatientData();
     setLatestEvent(event);
+    setLiveActionCards([]); // Clear action cards after event is saved
+  };
+
+  const handleActionGenerated = (actionCard) => {
+    setLiveActionCards(prev => [...prev, actionCard]);
   };
 
   const handleActionCompleted = async () => {
@@ -149,14 +155,15 @@ export default function PatientView3Col() {
             patientId={id}
             activeCycle={activeCycle}
             onEventCreated={handleEventCreated}
+            onActionGenerated={handleActionGenerated}
           />
         </div>
 
         {/* RIGHT: Actions & Templates (35%) */}
         <div className="col-span-4">
           <RightColumn_Actions
-            event={latestEvent}
-            templates={eventTemplates}
+            actionCards={liveActionCards}
+            templates={templates}
             onActionCompleted={handleActionCompleted}
           />
         </div>

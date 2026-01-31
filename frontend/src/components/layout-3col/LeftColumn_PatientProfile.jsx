@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Calendar, AlertCircle, Activity } from 'lucide-react';
+import TimelineStream from '../timeline/TimelineStream';
 
 export default function PatientProfile({ patient, activeCycle, timeline = [] }) {
   const [expandedVisit, setExpandedVisit] = useState(null);
@@ -122,71 +123,11 @@ export default function PatientProfile({ patient, activeCycle, timeline = [] }) 
         </div>
       )}
 
-      {/* Previous Visits - Vertical Timeline */}
-      <div className="claude-card p-6">
-        <h3 className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: 'var(--text-tertiary)' }}>
-          📅 Visit History
-        </h3>
-        
-        <div className="relative">
-          {/* Vertical Line */}
-          <div className="absolute left-3 top-0 bottom-0 w-0.5" style={{ background: 'var(--border-medium)' }}></div>
-          
-          <div className="space-y-4">
-            {previousVisits.map((visit, idx) => (
-              <div key={visit.id} className="relative pl-8">
-                {/* Dot on timeline */}
-                <div 
-                  className="absolute left-0 top-1 w-6 h-6 rounded-full border-2 flex items-center justify-center"
-                  style={{ 
-                    background: isSignificantEvent(visit.eventType) ? 'var(--accent-action)' : 'var(--bg-surface)',
-                    borderColor: isSignificantEvent(visit.eventType) ? 'var(--accent-action)' : 'var(--border-medium)'
-                  }}
-                >
-                  {isSignificantEvent(visit.eventType) && (
-                    <span className="text-xs">🔥</span>
-                  )}
-                </div>
-
-                {/* Visit Card */}
-                <div 
-                  onClick={() => setExpandedVisit(expandedVisit === visit.id ? null : visit.id)}
-                  className="cursor-pointer transition-all"
-                  style={{ 
-                    background: expandedVisit === visit.id ? 'var(--bg-subtle)' : 'transparent',
-                    padding: '8px',
-                    borderRadius: '8px'
-                  }}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>
-                      {visit.eventType.replace(/_/g, ' ').toUpperCase()}
-                    </span>
-                    <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                      Day {visit.cycleDay}
-                    </span>
-                  </div>
-                  <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                    {new Date(visit.eventDate).toLocaleDateString('en-IN', { 
-                      month: 'short', 
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </p>
-
-                  {/* Expanded Summary */}
-                  {expandedVisit === visit.id && visit.summaryText && (
-                    <div className="mt-2 pt-2 border-t text-xs" style={{ borderColor: 'var(--border-light)', color: 'var(--text-secondary)' }}>
-                      <p className="italic">"{visit.summaryText}"</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* Timeline Stream - New Bead-like Vertical Structure */}
+      <TimelineStream 
+        timeline={timeline}
+        patient={patient}
+      />
 
       {/* CURRENT / NOW Card */}
       <div className="claude-card p-6 border-2" style={{ borderColor: 'var(--accent-action)' }}>
@@ -216,39 +157,6 @@ export default function PatientProfile({ patient, activeCycle, timeline = [] }) 
           </p>
         )}
       </div>
-
-      {/* Important Future Events */}
-      {upcomingEvents.length > 0 && (
-        <div className="claude-card p-6">
-          <div className="flex items-center gap-2 mb-3">
-            <Calendar className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-            <h3 className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-tertiary)' }}>
-              Upcoming
-            </h3>
-          </div>
-          
-          <div className="space-y-2">
-            {upcomingEvents.map(event => (
-              <div key={event.id} className="flex justify-between items-start text-sm">
-                <div>
-                  <p className="font-medium" style={{ color: 'var(--text-primary)' }}>
-                    {event.eventType.replace(/_/g, ' ').toUpperCase()}
-                  </p>
-                  <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                    Day {event.cycleDay}
-                  </p>
-                </div>
-                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                  {new Date(event.eventDate).toLocaleDateString('en-IN', { 
-                    month: 'short', 
-                    day: 'numeric'
-                  })}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { MessageSquare, Phone, Send, Copy, Smile } from 'lucide-react';
+import EmojiReactionPicker from '../reactions/EmojiReactionPicker';
+import EmojiReactionPicker from '../reactions/EmojiReactionPicker';
 
 const REACTION_EMOJIS = [
   { emoji: '😊', label: 'Happy' },
@@ -17,203 +19,183 @@ const ACTION_TYPES = [
   { id: 'message', icon: Send, label: 'SMS', color: '#C17D4A' },
 ];
 
-export default function RightColumn_Actions({ event, templates = [], onActionCompleted }) {
-  const [selectedTemplate, setSelectedTemplate] = useState(null);
+export default function RightColumn_Actions({ actionCards = [], templates = [], onActionCompleted }) {
   const [showReactionCapture, setShowReactionCapture] = useState(false);
   const [currentAction, setCurrentAction] = useState(null);
+  const [completedActions, setCompletedActions] = useState([]);
 
-  const handleActionClick = (actionType, template) => {
-    setCurrentAction({ actionType, template });
+  const handleActionClick = (actionType, actionCard, template) => {
+    setCurrentAction({ actionType, actionCard, template });
     setShowReactionCapture(true);
   };
 
   const handleReactionSelect = async (reaction) => {
     if (!currentAction) return;
 
+    const completedAction = {
+      id: Date.now(),
+      actionCard: currentAction.actionCard,
+      actionType: currentAction.actionType,
+      template: currentAction.template,
+      reaction: reaction.emoji,
+      reactionLabel: reaction.label,
+      timestamp: new Date().toISOString(),
+    };
+
+    setCompletedActions(prev => [...prev, completedAction]);
+    
     try {
       // Save action + reaction to backend
       await fetch('http://localhost:3000/api/actions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          eventId: event.id,
-          templateId: currentAction.template?.id,
-          actionType: currentAction.actionType,
-          reaction: reaction.emoji,
-          reactionLabel: reaction.label,
-          timestamp: new Date().toISOString(),
-        }),
+        body: JSON.stringify(completedAction),
       });
 
       onActionCompleted?.();
-      setShowReactionCapture(false);
-      setCurrentAction(null);
     } catch (error) {
       console.error('Failed to save action:', error);
     }
+
+    setShowReactionCapture(false);
+    setCurrentAction(null);
   };
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
   };
 
-  if (!event) {
+  if (actionCards.length === 0) {
     return (
       <div className="h-screen flex items-center justify-center p-6" style={{ background: 'var(--bg-canvas)' }}>
-        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-          Create a clinical note to generate actions
-        </p>
+        <div className="text-center">
+          <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>
+            No action cards yet
+          </p>
+          <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+            Click chips in middle column to generate action cards
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="h-screen overflow-y-auto p-4 space-y-4" style={{ background: 'var(--bg-canvas)' }}>
-      {/* Event Header */}
-      <div className="claude-card p-4">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-2xl">📋</span>
-          <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-            {event.eventType.replace(/_/g, ' ').toUpperCase()}
-          </h3>
-        </div>
-        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-          {new Date(event.eventDate).toLocaleString('en-IN', {
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          })}
-        </p>
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-sm font-semibold uppercase tracking-wide" style={{ color: 'var(--text-tertiary)' }}>
+          📨 Action Cards ({actionCards.length})
+        </h3>
       </div>
 
-      {/* Templates Section */}
-      {templates.length > 0 && (
-        <div className="space-y-3">
-          <h4 className="text-xs font-semibold uppercase tracking-wide px-2" style={{ color: 'var(--text-tertiary)' }}>
-            📨 Communication Templates
-          </h4>
-          
-          {templates.map((template) => (
-            <div key={template.id} className="claude-card p-4 space-y-3">
-              <div className="flex items-center justify-between">
+      {/* Action Cards - Live Generated */}
+      {actionCards.map((actionCard, idx) => {
+        const cardTemplates = templates.filter(t => t.eventType === actionCard.eventType);
+        
+        return (
+          <div key={actionCard.id} className="claude-card p-4 space-y-3">
+            {/* Card Header */}
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">{actionCard.chipEmoji}</span>
                 <div>
                   <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                    {template.name}
+                    {actionCard.chipLabel}
                   </p>
                   <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                    {template.language} • {template.channel}
+                    {new Date(actionCard.timestamp).toLocaleTimeString('en-IN', { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
                   </p>
                 </div>
-                <button
-                  onClick={() => setSelectedTemplate(selectedTemplate === template.id ? null : template.id)}
-                  className="text-xs px-2 py-1 rounded"
-                  style={{
-                    background: 'var(--bg-subtle)',
-                    color: 'var(--text-secondary)'
-                  }}
-                >
-                  {selectedTemplate === template.id ? 'Collapse' : 'Preview'}
-                </button>
               </div>
-
-              {/* Template Preview */}
-              {selectedTemplate === template.id && (
-                <div className="pt-3 border-t" style={{ borderColor: 'var(--border-light)' }}>
-                  <pre className="whitespace-pre-wrap text-xs mb-3 font-sans" style={{
-                    color: 'var(--text-primary)',
-                    lineHeight: 'var(--leading-relaxed)',
-                    background: 'var(--bg-subtle)',
-                    padding: '12px',
-                    borderRadius: '8px'
-                  }}>
-                    {template.messageTemplate}
-                  </pre>
-                  
-                  <button
-                    onClick={() => copyToClipboard(template.messageTemplate)}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded text-xs font-medium w-full justify-center"
-                    style={{
-                      background: 'var(--bg-subtle)',
-                      border: '1px solid var(--border-medium)',
-                      color: 'var(--text-primary)'
-                    }}
-                  >
-                    <Copy className="w-3 h-3" />
-                    Copy to Clipboard
-                  </button>
-                </div>
+              
+              {completedActions.some(a => a.actionCard.id === actionCard.id) && (
+                <span className="text-lg">✅</span>
               )}
+            </div>
 
-              {/* Action Buttons */}
+            {/* Note Preview */}
+            <div className="p-2 rounded text-xs" style={{ 
+              background: 'var(--bg-subtle)',
+              color: 'var(--text-secondary)'
+            }}>
+              {actionCard.noteText}
+            </div>
+
+            {/* Templates for this action */}
+            {cardTemplates.length > 0 && (
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-tertiary)' }}>
-                  Actions:
+                  Communication Templates:
                 </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {ACTION_TYPES.map(action => (
-                    <button
-                      key={action.id}
-                      onClick={() => handleActionClick(action.id, template)}
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all hover:scale-105"
-                      style={{
-                        background: action.color,
-                        color: 'white'
-                      }}
-                    >
-                      <action.icon className="w-3 h-3" />
-                      {action.label}
-                    </button>
-                  ))}
-                </div>
+                {cardTemplates.slice(0, 2).map((template) => (
+                  <div key={template.id} className="border rounded p-2" style={{ borderColor: 'var(--border-light)' }}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>
+                        {template.channel} • {template.language}
+                      </span>
+                      <button
+                        onClick={() => copyToClipboard(template.messageTemplate)}
+                        className="text-xs px-2 py-1 rounded"
+                        style={{
+                          background: 'var(--bg-subtle)',
+                          color: 'var(--text-secondary)'
+                        }}
+                      >
+                        📋 Copy
+                      </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-1">
+                      {ACTION_TYPES.map(action => (
+                        <button
+                          key={action.id}
+                          onClick={() => handleActionClick(action.id, actionCard, template)}
+                          disabled={completedActions.some(a => a.actionCard.id === actionCard.id)}
+                          className="flex items-center gap-1 px-2 py-1.5 rounded text-xs font-medium transition-all"
+                          style={{
+                            background: completedActions.some(a => a.actionCard.id === actionCard.id) 
+                              ? 'var(--text-disabled)' 
+                              : action.color,
+                            color: 'white',
+                            opacity: completedActions.some(a => a.actionCard.id === actionCard.id) ? 0.5 : 1,
+                            cursor: completedActions.some(a => a.actionCard.id === actionCard.id) ? 'not-allowed' : 'pointer'
+                          }}
+                        >
+                          <action.icon className="w-3 h-3" />
+                          {action.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            )}
 
-      {/* Reaction Capture Modal */}
-      {showReactionCapture && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowReactionCapture(false)}>
-          <div className="claude-card p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-              Patient Reaction
-            </h3>
-            <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-              How did the patient respond to: <strong>{currentAction?.actionType}</strong>
-            </p>
-            
-            <div className="grid grid-cols-3 gap-3">
-              {REACTION_EMOJIS.map(reaction => (
-                <button
-                  key={reaction.emoji}
-                  onClick={() => handleReactionSelect(reaction)}
-                  className="flex flex-col items-center gap-2 p-4 rounded-lg transition-all hover:scale-110"
-                  style={{
-                    background: 'var(--bg-subtle)',
-                    border: '2px solid var(--border-light)'
-                  }}
-                >
-                  <span className="text-3xl">{reaction.emoji}</span>
-                  <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                    {reaction.label}
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={() => setShowReactionCapture(false)}
-              className="w-full mt-4 px-4 py-2 rounded-lg text-sm font-medium"
-              style={{
-                background: 'var(--bg-subtle)',
-                color: 'var(--text-secondary)'
-              }}
-            >
-              Cancel
-            </button>
+            {/* Completed Action for this card */}
+            {completedActions.filter(a => a.actionCard.id === actionCard.id).map(action => (
+              <div key={action.id} className="flex items-center justify-between p-2 rounded" style={{
+                background: 'var(--mood-calm)',
+                borderLeft: '3px solid var(--accent-success)'
+              }}>
+                <span className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>
+                  {action.actionType.toUpperCase()} completed
+                </span>
+                <span className="text-2xl">{action.reaction}</span>
+              </div>
+            ))}
           </div>
-        </div>
+        );
+      })}
+
+      {/* Reaction Capture Modal - Using EmojiReactionPicker */}
+      {showReactionCapture && currentAction && (
+        <EmojiReactionPicker
+          onSelect={handleReactionSelect}
+          onCancel={() => setShowReactionCapture(false)}
+        />
       )}
 
       {/* Completed Actions Log */}

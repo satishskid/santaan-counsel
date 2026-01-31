@@ -184,3 +184,118 @@ export const getPatientTimeline = async (req, res, next) => {
     next(error);
   }
 };
+
+// Search patients (active only for autocomplete)
+export const searchPatients = async (req, res, next) => {
+  try {
+    const { q, activeOnly = 'false' } = req.query;
+    
+    if (!q || q.length < 2) {
+      return res.json([]);
+    }
+    
+    const where = {
+      clinicId: req.user.clinicId,
+      OR: [
+        { firstName: { contains: q, mode: 'insensitive' } },
+        { lastName: { contains: q, mode: 'insensitive' } },
+        { mrNumber: { contains: q, mode: 'insensitive' } },
+        { phone: { contains: q } },
+      ],
+    };
+    
+    // Filter active patients only
+    if (activeOnly === 'true') {
+      where.cycles = {
+        some: { status: 'active' },
+      };
+    }
+    
+    const patients = await prisma.patient.findMany({
+      where,
+      include: {
+        cycles: {
+          where: { status: 'active' },
+          take: 1,
+          orderBy: { createdAt: 'desc' },
+        },
+        timelineEvents: {
+          take: 1,
+          orderBy: { eventDate: 'desc' },
+          select: {
+            eventType: true,
+            eventDate: true,
+          },
+        },
+        actions: {
+          where: { status: 'pending' },
+          select: { id: true },
+        },
+      },
+      take: 10,
+      orderBy: { updatedAt: 'desc' },
+    });
+    
+    res.json(patients);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Quick walk-in registration
+export const createWalkin = async (req, res, next) => {
+  try {
+    const { firstName, lastName, age, phone, email, reason } = req.body;
+    
+    // Generate MR number
+    const lastPatient = await prisma.patient.findFirst({
+      where: { clinicId: req.user.clinicId },
+      orderBy: { mrNumber: 'desc' },
+    });
+    
+    const lastNumber = lastPatient?.mrNumber ? parseInt(lastPatient.mrNumber.replace(/\D/g, '')) : 0;
+    const mrNumber = `MR${String(lastNumber + 1).padStart(5, '0')}`;
+    
+    // Create patient
+    const patient = await prisma.patient.create({
+      data: {
+        clinicId: req.user.clinicId,
+        mrNumber,
+        firstName,
+        lastName,
+        age: parseInt(age),
+        phone,
+        email,
+        firstVisitDate: new Date(),
+      },
+    });
+    
+    // Create active cycle
+    const cycle = await prisma.treatmentCycle.create({
+      data: {
+        patientId: patient.id,
+        cycleNumber: 1,
+        startDate: new Date(),
+        status: 'active',
+        isActive: true,
+      },
+    });
+    
+    // Create first timeline event
+    await prisma.timelineEvent.create({
+      data: {
+        patientId: patient.id,
+        cycleId: cycle.id,
+        eventType: reason || 'initial_consultation',
+        eventDate: new Date(),
+        creatorId: req.user.id,
+        staffRole: req.user.role,
+        summaryText: `Walk-in patient registered - ${reason || 'initial consultation'}`,
+      },
+    });
+    
+    res.status(201).json({ patient, cycle });
+  } catch (error) {
+    next(error);
+  }
+};

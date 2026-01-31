@@ -9,6 +9,7 @@ import patientsRoutes from './routes/patients.routes.js';
 import timelineRoutes from './routes/timeline.routes.js';
 import acronymsRoutes from './routes/acronyms.routes.js';
 import templatesRoutes from './routes/templates.routes.js';
+import protocolsRoutes from './routes/protocols.routes.js';
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use('/api/patients', patientsRoutes);
 app.use('/api/timeline', timelineRoutes);
 app.use('/api/acronyms', acronymsRoutes);
 app.use('/api/templates', templatesRoutes);
+app.use('/api/protocols', protocolsRoutes);
 
 // 404 handler
 app.use((req, res) => {

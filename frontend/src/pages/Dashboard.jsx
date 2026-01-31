@@ -2,12 +2,15 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
+import PatientSearchAutocomplete from '../components/common/PatientSearchAutocomplete';
+import WalkinRegistrationModal from '../components/common/WalkinRegistrationModal';
 
 export default function Dashboard() {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showWalkinModal, setShowWalkinModal] = useState(false);
   
   useEffect(() => {
     fetchPatients();
@@ -27,6 +30,22 @@ export default function Dashboard() {
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+  
+  const handleWalkinRegister = async (formData) => {
+    try {
+      const response = await api.post('/patients/walkin', formData);
+      setShowWalkinModal(false);
+      // Navigate to new patient
+      navigate(`/patients/${response.data.patient.id}`);
+    } catch (error) {
+      console.error('Error registering walk-in:', error);
+      alert('Failed to register patient');
+    }
+  };
+  
+  const handleSearchSelect = (patient) => {
+    navigate(`/patients/${patient.id}`);
   };
   
   return (
@@ -80,6 +99,30 @@ export default function Dashboard() {
           </div>
         </div>
         
+        {/* Quick Actions */}
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Search Active Patients
+              </label>
+              <PatientSearchAutocomplete onSelect={handleSearchSelect} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Quick Registration
+              </label>
+              <button
+                onClick={() => setShowWalkinModal(true)}
+                className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition flex items-center justify-center gap-2"
+              >
+                <span className="text-lg">🚶</span>
+                <span>Register Walk-in Patient</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        
         {/* Recent Patients */}
         <div className="bg-white rounded-lg shadow">
           <div className="px-6 py-4 border-b border-gray-200">
@@ -121,6 +164,14 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
+      
+      {/* Walk-in Registration Modal */}
+      {showWalkinModal && (
+        <WalkinRegistrationModal
+          onRegister={handleWalkinRegister}
+          onClose={() => setShowWalkinModal(false)}
+        />
+      )}
     </div>
   );
 }
