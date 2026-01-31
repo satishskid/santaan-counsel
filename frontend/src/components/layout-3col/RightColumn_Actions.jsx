@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { MessageSquare, Phone, Send, Copy, Smile } from 'lucide-react';
 import EmojiReactionPicker from '../reactions/EmojiReactionPicker';
-import EmojiReactionPicker from '../reactions/EmojiReactionPicker';
 
 const REACTION_EMOJIS = [
   { emoji: '😊', label: 'Happy' },
