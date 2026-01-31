@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Stethoscope, Plus, Trash2, ChevronDown } from 'lucide-react';
+import ProtocolScheduleEditor from '../protocols/ProtocolScheduleEditor';
+import api from '../../utils/api';
 
 // Event types that drive the entire system
 const EVENT_TYPES = [
@@ -44,6 +46,10 @@ const CHIPS_BY_EVENT = {
       { emoji: '👀', label: 'Ovaries Normal', text: 'Both ovaries normal, no cysts.' },
       { emoji: '⚠️', label: 'Cyst Found', text: 'Cyst observed: [size]mm, [location].' },
       { emoji: '✅', label: 'Cleared to Start', text: 'Baseline scan normal, cleared to start stimulation.' },
+      { emoji: '🟣', label: 'Start Antagonist 150', text: 'Starting Antagonist 150 IU protocol', isProtocol: true, protocolId: 'protocol_antagonist_150' },
+      { emoji: '🟣', label: 'Start Antagonist 225', text: 'Starting Antagonist 225 IU protocol', isProtocol: true, protocolId: 'protocol_antagonist_225' },
+      { emoji: '🟣', label: 'Start Agonist Long', text: 'Starting Long Agonist protocol', isProtocol: true, protocolId: 'protocol_agonist_long' },
+      { emoji: '🟣', label: 'Start Natural Cycle', text: 'Starting Natural Cycle protocol', isProtocol: true, protocolId: 'protocol_natural_cycle' },
     ],
     nurse: [
       { emoji: '💉', label: 'Meds Explained', text: 'Injection technique and medication schedule explained.' },
@@ -216,9 +222,27 @@ export default function MiddleColumn_ClinicalLogging({ patientId, activeCycle, o
   const [actionCards, setActionCards] = useState([]);
   const [generating, setGenerating] = useState(false);
   const [expandedRoles, setExpandedRoles] = useState([]);
+  const [showProtocolEditor, setShowProtocolEditor] = useState(false);
+  const [selectedProtocol, setSelectedProtocol] = useState(null);
+  const [protocols, setProtocols] = useState([]);
 
-  const addChipText = (chip) => {
-    // Add text to note
+  const addChipText = async (chip) => {
+    // Check if this is a protocol chip
+    if (chip.isProtocol) {
+      try {
+        // Fetch the specific protocol
+        const response = await api.get(`/protocols/${chip.protocolId}`);
+        const protocol = response.data;
+        setSelectedProtocol(protocol);
+        setShowProtocolEditor(true);
+      } catch (error) {
+        console.error('Failed to load protocol:', error);
+        alert('Failed to load protocol');
+      }
+      return;
+    }
+    
+    // Regular chip - add text to note
     const newNote = clinicalNote ? `${clinicalNote} ${chip.text}` : chip.text;
     setClinicalNote(newNote);
     
@@ -250,6 +274,38 @@ export default function MiddleColumn_ClinicalLogging({ patientId, activeCycle, o
         ? prev.filter(r => r !== role)
         : [...prev, role]
     );
+  };
+
+  const handleProtocolConfirm = async (startDate, customSchedule) => {
+    try {
+      setGenerating(true);
+      
+      // Generate action series from protocol
+      const response = await api.post(`/protocols/${selectedProtocol.id}/generate`, {
+        patientId,
+        cycleId: activeCycle?.id,
+        startDate,
+        customSchedule,
+      });
+      
+      const { series, actionsGenerated } = response.data;
+      
+      // Add protocol text to clinical note
+      const protocolNote = `${selectedProtocol.name} protocol started from ${startDate}. ${actionsGenerated} actions scheduled.`;
+      const newNote = clinicalNote ? `${clinicalNote} ${protocolNote}` : protocolNote;
+      setClinicalNote(newNote);
+      
+      // Close editor
+      setShowProtocolEditor(false);
+      setSelectedProtocol(null);
+      
+      alert(`✅ Protocol scheduled! ${actionsGenerated} actions generated over ${selectedProtocol.duration} days.`);
+    } catch (error) {
+      console.error('Failed to generate protocol actions:', error);
+      alert('Failed to generate protocol schedule');
+    } finally {
+      setGenerating(false);
+    }
   };
 
   const getChipsForEvent = () => {
@@ -337,6 +393,21 @@ export default function MiddleColumn_ClinicalLogging({ patientId, activeCycle, o
           </select>
         </div>
 
+        {/* Protocol Schedule Editor - Inline Expansion */}
+        {showProtocolEditor && selectedProtocol && (
+          <div className="claude-card p-6 border-2" style={{ borderColor: 'var(--accent-purple)' }}>
+            <ProtocolScheduleEditor
+              protocol={selectedProtocol}
+              startDate={new Date().toISOString().split('T')[0]}
+              onConfirm={handleProtocolConfirm}
+              onCancel={() => {
+                setShowProtocolEditor(false);
+                setSelectedProtocol(null);
+              }}
+            />
+          </div>
+        )}
+
         {/* Role-Specific Chips - Organized by Role */}
         <div className="claude-card p-5 space-y-4">
           <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-tertiary)' }}>
@@ -374,9 +445,9 @@ export default function MiddleColumn_ClinicalLogging({ patientId, activeCycle, o
                       onClick={() => addChipText(chip)}
                       className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all hover:scale-105"
                       style={{
-                        background: 'var(--bg-subtle)',
-                        border: '1px solid var(--border-medium)',
-                        color: 'var(--text-primary)',
+                        background: chip.isProtocol ? 'linear-gradient(135deg, #9333EA, #7C3AED)' : 'var(--bg-subtle)',
+                        border: chip.isProtocol ? '2px solid #9333EA' : '1px solid var(--border-medium)',
+                        color: chip.isProtocol ? 'white' : 'var(--text-primary)',
                       }}
                     >
                       <span>{chip.emoji}</span>
