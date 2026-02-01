@@ -12,12 +12,22 @@
     "dev:frontend": "cd frontend && npm run dev",
     "migrate": "cd backend && npx prisma migrate deploy",
     "seed": "cd backend && npx prisma db seed",
-    "setup": "npm run install:all && npm run migrate && npm run seed"
+    "setup": "npm run install:all && npm run migrate && npm run seed",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report",
+    "test:all": "bash scripts/test_all.sh"
   },
-  "keywords": ["ivf", "clinic", "healthcare", "timeline"],
+  "keywords": [
+    "ivf",
+    "clinic",
+    "healthcare",
+    "timeline"
+  ],
   "author": "Santaan Team",
   "license": "MIT",
   "devDependencies": {
+    "@playwright/test": "^1.58.1",
     "concurrently": "^8.2.2"
   },
   "dependencies": {
