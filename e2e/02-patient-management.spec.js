@@ -4,7 +4,8 @@ test.describe('Patient Management', () => {
   test.beforeEach(async ({ page }) => {
     // Login before each test
     await page.goto('/login');
-    await page.fill('input[type="email"]', 'admin@demo.clinic');
+    await page.fill('input[placeholder*="nurse1"]', 'admin');
+    await page.fill('input[placeholder="demo"]', 'demo');
     await page.fill('input[type="password"]', 'admin123');
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/dashboard/);

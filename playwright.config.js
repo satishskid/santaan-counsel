@@ -9,7 +9,7 @@ export default defineConfig({
   reporter: 'html',
   
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:5175',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -22,18 +22,19 @@ export default defineConfig({
     },
   ],
 
-  webServer: [
-    {
-      command: 'cd backend && npm start',
-      url: 'http://localhost:3000/health',
-      timeout: 30 * 1000,
-      reuseExistingServer: true,
-    },
-    {
-      command: 'cd frontend && npm run dev',
-      url: 'http://localhost:5173',
-      timeout: 30 * 1000,
-      reuseExistingServer: true,
-    },
-  ],
+  // Comment out webServer - manually start backend and frontend before running tests
+  // webServer: [
+  //   {
+  //     command: 'cd backend && npm start',
+  //     url: 'http://localhost:3000/health',
+  //     timeout: 30 * 1000,
+  //     reuseExistingServer: true,
+  //   },
+  //   {
+  //     command: 'cd frontend && npm run dev',
+  //     url: 'http://localhost:5173',
+  //     timeout: 30 * 1000,
+  //     reuseExistingServer: true,
+  //   },
+  // ],
 });
