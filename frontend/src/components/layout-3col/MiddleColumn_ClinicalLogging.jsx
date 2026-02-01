@@ -347,6 +347,9 @@ export default function MiddleColumn_ClinicalLogging({ patientId, activeCycle, o
     }
   };
 
+  // Alias for generateEvent to match UI button reference
+  const completeEvent = generateEvent;
+
   const chipsByRole = getChipsForEvent();
   const roles = Object.keys(chipsByRole);
 
