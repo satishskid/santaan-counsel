@@ -105,11 +105,11 @@ export const getAllTemplates = async (req, res) => {
   try {
     const templates = await prisma.template.findMany({
       where: {
-        clinicId: req.user.clinicId,
+        isActive: true,
       },
       orderBy: [
         { eventType: 'asc' },
-        { usageCount: 'desc' },
+        { timesUsed: 'desc' },
       ],
     });
 
