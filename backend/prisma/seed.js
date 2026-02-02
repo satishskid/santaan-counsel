@@ -162,7 +162,6 @@ async function main() {
         const transformedTemplates = templates
           .filter(t => t.language === 'english' || t.language === 'hinglish') // English-only for now
           .map(template => ({
-            clinicId: clinic.id,
             name: template.eventName,
             eventType: template.eventName.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
             category: 'communication',
