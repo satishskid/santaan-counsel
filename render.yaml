@@ -25,7 +25,7 @@ services:
 
   # Frontend (Static Site)
   - type: web
-    name: santaan-frontend
+    name: actions-santaan
     runtime: static
     branch: main
     buildCommand: cd frontend && npm ci && npm run build
