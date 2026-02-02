@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import EventBubble from './EventBubble';
 import InlineEventEditor from './InlineEventEditor';
 import { Plus } from 'lucide-react';
+import api from '../../utils/api';
 
 export default function ConversationalTimeline({ patientId, timeline = [] }) {
   const [showEditor, setShowEditor] = useState(false);
@@ -14,8 +15,8 @@ export default function ConversationalTimeline({ patientId, timeline = [] }) {
     const fetchTemplates = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://localhost:3000/api/templates/all');
-        const allTemplates = await response.json();
+        const response = await api.get('/templates/all');
+        const allTemplates = response.data;
         
         // Group templates by event type
         const grouped = {};
@@ -98,7 +99,7 @@ export default function ConversationalTimeline({ patientId, timeline = [] }) {
             No timeline events yet
           </p>
           <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
-            Click "Add Event" to start building the patient journey
+            Click &ldquo;Add Event&rdquo; to start building the patient journey
           </p>
         </div>
       ) : (

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X, Save } from 'lucide-react';
+import api from '../../utils/api';
 
 const EVENT_TYPES = [
   { value: 'patient_inquiry', label: 'Patient Inquiry' },
@@ -35,25 +36,21 @@ export default function InlineEventEditor({ patientId, initialEventType, onCance
     setSaving(true);
 
     try {
-      const response = await fetch('http://localhost:3000/api/timeline-events', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          patientId,
-          eventType: formData.eventType,
-          eventDate: new Date(formData.eventDate).toISOString(),
-          cycleDay: formData.cycleDay ? parseInt(formData.cycleDay) : null,
-          patientRecordText: formData.patientRecordText,
-          summaryText: formData.summaryText,
-          reactionData: {
-            emotional_response: formData.emotionalResponse,
-            anxiety_before: parseInt(formData.anxietyBefore),
-            anxiety_after: parseInt(formData.anxietyAfter),
-          },
-        }),
+      const response = await api.post('/timeline-events', {
+        patientId,
+        eventType: formData.eventType,
+        eventDate: new Date(formData.eventDate).toISOString(),
+        cycleDay: formData.cycleDay ? parseInt(formData.cycleDay) : null,
+        patientRecordText: formData.patientRecordText,
+        summaryText: formData.summaryText,
+        reactionData: {
+          emotional_response: formData.emotionalResponse,
+          anxiety_before: parseInt(formData.anxietyBefore),
+          anxiety_after: parseInt(formData.anxietyAfter),
+        },
       });
 
-      if (response.ok) {
+      if (response.status === 200 || response.status === 201) {
         onSave();
       } else {
         console.error('Failed to save event');

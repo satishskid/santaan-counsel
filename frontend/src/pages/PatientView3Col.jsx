@@ -52,8 +52,8 @@ export default function PatientView3Col() {
 
   const fetchTemplates = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/templates/all');
-      const allTemplates = await response.json();
+      const response = await api.get('/templates/all');
+      const allTemplates = response.data;
       setTemplates(allTemplates);
     } catch (error) {
       console.error('Failed to fetch templates:', error);

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search } from 'lucide-react';
+import api from '../../utils/api';
 
 export default function PatientSearchAutocomplete({ onSelect, placeholder = "Search active patients..." }) {
   const [query, setQuery] = useState('');
@@ -31,9 +32,8 @@ export default function PatientSearchAutocomplete({ onSelect, placeholder = "Sea
   
   const searchPatients = async (q) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/patients/search?q=${q}&activeOnly=true`);
-      const data = await response.json();
-      setResults(data);
+      const response = await api.get(`/patients/search?q=${q}&activeOnly=true`);
+      setResults(response.data);
       setIsOpen(true);
     } catch (error) {
       console.error('Search error:', error);

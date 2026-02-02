@@ -320,18 +320,14 @@ export default function MiddleColumn_ClinicalLogging({ patientId, activeCycle, o
 
     setGenerating(true);
     try {
-      const response = await fetch('http://localhost:3000/api/timeline-events', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          patientId,
-          eventType: selectedEventType,
-          eventDate: new Date().toISOString(),
-          cycleDay: activeCycle?.cycleDay || null,
-          patientRecordText: clinicalNote,
-          summaryText: clinicalNote.substring(0, 200),
-          soapNote: clinicalNote,
-        }),
+      const response = await api.post('/timeline-events', {
+        patientId,
+        eventType: selectedEventType,
+        eventDate: new Date().toISOString(),
+        cycleDay: activeCycle?.cycleDay || null,
+        patientRecordText: clinicalNote,
+        summaryText: clinicalNote.substring(0, 200),
+        soapNote: clinicalNote,
       });
 
       if (response.ok) {

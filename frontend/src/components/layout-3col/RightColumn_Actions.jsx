@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MessageSquare, Phone, Send, Copy, Smile } from 'lucide-react';
 import EmojiReactionPicker from '../reactions/EmojiReactionPicker';
+import api from '../../utils/api';
 
 const REACTION_EMOJIS = [
   { emoji: '😊', label: 'Happy' },
@@ -45,11 +46,7 @@ export default function RightColumn_Actions({ actionCards = [], templates = [], 
     
     try {
       // Save action + reaction to backend
-      await fetch('http://localhost:3000/api/actions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(completedAction),
-      });
+      await api.post('/actions', completedAction);
 
       onActionCompleted?.();
     } catch (error) {
