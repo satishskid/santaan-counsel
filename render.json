@@ -1,0 +1,72 @@
+{
+  "services": [
+    {
+      "type": "web",
+      "name": "santaan-backend",
+      "runtime": "node",
+      "region": "oregon",
+      "plan": "free",
+      "branch": "main",
+      "buildCommand": "cd backend && npm ci && npx prisma generate",
+      "startCommand": "cd backend && npx prisma migrate deploy && npx prisma db seed && npm start",
+      "healthCheckPath": "/api/health",
+      "envVars": [
+        {
+          "key": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "key": "PORT",
+          "value": "10000"
+        },
+        {
+          "key": "DATABASE_URL",
+          "fromDatabase": {
+            "name": "santaan-db",
+            "property": "connectionString"
+          }
+        },
+        {
+          "key": "JWT_SECRET",
+          "generateValue": true
+        },
+        {
+          "key": "CORS_ORIGIN",
+          "value": "https://santaan-frontend.onrender.com"
+        }
+      ]
+    },
+    {
+      "type": "web",
+      "name": "santaan-frontend",
+      "runtime": "static",
+      "region": "oregon",
+      "plan": "free",
+      "branch": "main",
+      "buildCommand": "cd frontend && npm ci && VITE_API_URL=https://santaan-backend.onrender.com npm run build",
+      "staticPublishPath": "./frontend/dist",
+      "routes": [
+        {
+          "type": "rewrite",
+          "source": "/*",
+          "destination": "/index.html"
+        }
+      ],
+      "envVars": [
+        {
+          "key": "VITE_API_URL",
+          "value": "https://santaan-backend.onrender.com"
+        }
+      ]
+    }
+  ],
+  "databases": [
+    {
+      "name": "santaan-db",
+      "databaseName": "santaan_db",
+      "user": "santaan",
+      "plan": "free",
+      "region": "oregon"
+    }
+  ]
+}

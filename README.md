@@ -22,7 +22,25 @@ Santaan is a comprehensive IVF clinic management platform designed to streamline
 
 ## 🚀 Quick Deploy (Production)
 
-### One-Command Deployment
+### ⚡ Render.com (Free Tier - Recommended)
+
+**One-Click Deploy**: 
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/satishskid/santaan-counsel)
+
+**Time**: 10 minutes | **Cost**: $0/month (90 days free database)
+
+```bash
+# Or manual deploy:
+1. Sign up at render.com
+2. Connect GitHub repo: satishskid/santaan-counsel
+3. Deploy from render.yaml (auto-detected)
+4. Access at: https://santaan-frontend.onrender.com
+```
+
+📚 **Render Guide**: [RENDER_QUICK_START.md](./RENDER_QUICK_START.md) (step-by-step with screenshots)
+
+### 🐳 Docker (Self-Hosted)
 
 ```bash
 git clone https://github.com/satishskid/santaan-counsel.git
@@ -42,7 +60,7 @@ nano .env  # Set DB_PASSWORD and JWT_SECRET
 - API: http://localhost:3000
 - Default credentials: admin / demo / admin123
 
-📚 **Full deployment guide**: [DEPLOYMENT.md](./DEPLOYMENT.md)  
+📚 **Full deployment guide**: [DEPLOYMENT.md](./DEPLOYMENT.md) (AWS, DigitalOcean, Railway)  
 ✅ **Production checklist**: [PRODUCTION_CHECKLIST.md](./PRODUCTION_CHECKLIST.md)
 
 ---
