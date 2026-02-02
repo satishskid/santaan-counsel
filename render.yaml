@@ -27,8 +27,6 @@ services:
   - type: web
     name: santaan-frontend
     runtime: static
-    region: oregon
-    plan: free
     branch: main
     buildCommand: cd frontend && npm ci && npm run build
     staticPublishPath: ./frontend/dist
