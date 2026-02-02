@@ -2,7 +2,7 @@
   "services": [
     {
       "type": "web",
-      "name": "santaan-backend",
+      "name": "actions-santaan",
       "runtime": "node",
       "region": "oregon",
       "plan": "free",
@@ -43,7 +43,7 @@
       "region": "oregon",
       "plan": "free",
       "branch": "main",
-      "buildCommand": "cd frontend && npm ci && VITE_API_URL=https://santaan-backend.onrender.com npm run build",
+      "buildCommand": "cd frontend && npm ci && VITE_API_URL=https://actions-santaan.onrender.com npm run build",
       "staticPublishPath": "./frontend/dist",
       "routes": [
         {
@@ -55,7 +55,7 @@
       "envVars": [
         {
           "key": "VITE_API_URL",
-          "value": "https://santaan-backend.onrender.com"
+          "value": "https://actions-santaan.onrender.com"
         }
       ]
     }
