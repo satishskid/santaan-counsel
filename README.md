@@ -1,7 +1,5 @@
 # Santaan IVF Platform
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/YOUR_USERNAME/santaan-ivf)
-
 > Timeline-driven IVF clinic management system where every patient journey is a living document with staff-mediated communication at every milestone.
 
 ## 🌟 Overview
@@ -9,84 +7,91 @@
 Santaan is a comprehensive IVF clinic management platform designed to streamline patient care through:
 
 - **Timeline-Driven Patient Journeys**: Every patient interaction is a chronological event
-- **Staff Augmentation**: Templates guide communication, not replace human touch
-- **Acronym Expansion**: Clinical shorthand automatically converts to full medical records
+- **810+ Communication Templates**: Pre-built messages in English & Odia
+- **7 Treatment Protocols**: Standardized IVF workflows with automated actions
 - **Reaction Capture**: Track patient understanding and anxiety at every step
-- **Multi-Tenant Support**: Serve multiple clinics from one installation
-- **Role-Based Access**: Doctor, Nurse, Embryologist, Counselor, Receptionist roles
+- **Acronym Expansion**: 16 medical terms automatically expanded
+- **Multi-Role Access**: Doctor, Nurse, Embryologist, Counselor, Receptionist, Admin
+- **100% Test Coverage**: 27/27 E2E tests passing
 
 ## 🎯 Core Principle
 
 **Events → Templates → Communication → Reaction Capture → Timeline Update**
 
-## ⚡ One-Click Deploy (Recommended)
+---
 
-Deploy to Netlify + Neon (FREE tier available):
+## 🚀 Quick Deploy (Production)
 
-1. **Get Neon Database** (Free serverless Postgres)
-   - Sign up at [neon.tech](https://neon.tech)
-   - Create database → Copy connection string
+### One-Command Deployment
 
-2. **Click Deploy Button** (above)
-   - Connect GitHub repository
-   - Add `DATABASE_URL` in Netlify environment variables
-   - Add `JWT_SECRET` (any random string)
-   - Deploy automatically builds and launches
+```bash
+git clone https://github.com/satishskid/santaan-counsel.git
+cd santaan-counsel
+cp .env.example .env
+nano .env  # Set DB_PASSWORD and JWT_SECRET
+./deploy.sh
+```
 
-3. **Initialize Database**
-   - Visit: `https://your-site.netlify.app/.netlify/functions/migrate`
-   - This runs migrations and seeds demo data
+**Requirements:**
+- Docker & Docker Compose
+- 2GB+ RAM
+- Ports 80, 3000, 5432 available
 
-4. **Login**
-   - Email: `admin@demo.clinic`
-   - Password: `admin123`
+**Access:**
+- Frontend: http://localhost
+- API: http://localhost:3000
+- Default credentials: admin / demo / admin123
 
-📚 **Full deploy guide**: [DEPLOY_NETLIFY.md](./DEPLOY_NETLIFY.md)
+📚 **Full deployment guide**: [DEPLOYMENT.md](./DEPLOYMENT.md)  
+✅ **Production checklist**: [PRODUCTION_CHECKLIST.md](./PRODUCTION_CHECKLIST.md)
 
 ---
 
 ## 🖥️ Local Development
 
-### Quick Start (Recommended)
+### Quick Start
 
 ```bash
 # 1. Clone repository
-git clone <repository-url>
-cd santaan-teleprompt
+git clone https://github.com/satishskid/santaan-counsel.git
+cd santaan-counsel
 
-# 2. Get Neon database connection string from neon.tech
+# 2. Set up backend environment
+cd backend
+cp .env.example .env
+nano .env  # Add your DATABASE_URL
 
-# 3. Create backend/.env
-cp backend/.env.example backend/.env
-# Edit backend/.env and add your DATABASE_URL
+# 3. Install dependencies
+npm install
+cd ../frontend
+npm install
 
-# 4. Run setup script
-./start.sh
+# 4. Start backend
+cd ../backend
+npm run prisma:migrate
+npm run prisma:seed
+npm start
+
+# 5. Start frontend (new terminal)
+cd ../frontend
+npm run dev
 ```
 
-The script will:
-- ✅ Install all dependencies
-- ✅ Run database migrations
-- ✅ Seed demo data
-- ✅ Start frontend (http://localhost:5173) and backend (http://localhost:3000)
+**Access:**
+- Frontend: http://localhost:5175
+- Backend: http://localhost:3000
 
 **Default Login:**
-- Email: `admin@demo.clinic`
+- Username: `admin`
+- Clinic Domain: `demo`
 - Password: `admin123`
-```
 
-### Demo Credentials
+**Other demo users:**
+- `doctor1` / `demo` / `admin123`
+- `nurse1` / `demo` / `admin123`
+- `embryo1` / `demo` / `admin123`
 
-```
-Username: admin
-Clinic Domain: demo
-Password: admin123
-
-Other demo users:
-- doctor1@demo / admin123
-- nurse1@demo / admin123
-- embryo1@demo / admin123
-```
+---
 
 ## 📋 Tech Stack
 
@@ -105,11 +110,14 @@ Other demo users:
 - **State Management**: Zustand
 - **HTTP Client**: Axios
 - **Routing**: React Router v6
+- **Icons**: @heroicons/react
 
-### Deployment
+### DevOps & Testing
 - **Containerization**: Docker + Docker Compose
 - **Web Server**: Nginx (for frontend)
 - **Database**: PostgreSQL (containerized)
+- **E2E Testing**: Playwright (27/27 tests passing, 100%)
+- **Automation**: deploy.sh, health-check.sh, backup.sh
 
 ## 🏗️ Project Structure
 
@@ -210,6 +218,14 @@ Track patient responses:
 - **clinic_performance**: Daily metrics rollup
 
 See [backend/prisma/schema.prisma](backend/prisma/schema.prisma) for complete schema.
+
+### Seed Data
+
+On deployment, the database is seeded with:
+- **810 Communication Templates** (English & Odia)
+- **7 Treatment Protocols** (IVF, ICSI, Freeze-All, etc.)
+- **16 Medical Acronyms** (E2, AFC, FSH, AMH, etc.)
+- **6 Demo Users** (Admin, Doctor, Nurse, Embryologist, Counselor, Receptionist)
 
 ## 🔌 API Endpoints
 
@@ -361,11 +377,51 @@ Create `.env` file in project root:
 DB_PASSWORD=your-secure-password
 
 # JWT
-JWT_SECRET=your-super-secret-key
+JWT_SECRET=your-super-secret-key-min-32-chars
 
 # CORS (optional, for development)
-CORS_ORIGIN=http://localhost:5173
+CORS_ORIGIN=http://localhost:5175
 ```
+
+## 🔧 Deployment Operations
+
+### Health Check
+```bash
+./health-check.sh
+# Verifies: Docker services, API endpoints, database, templates (810), protocols (7), acronyms (16)
+```
+
+### Database Backup
+```bash
+./backup.sh
+# Creates: timestamped pg_dump + uploads tar.gz
+# Retention: 30 days automatic cleanup
+# Location: /backups/
+```
+
+### Manual Deployment Steps
+```bash
+# 1. Clone repository
+git clone https://github.com/satishskid/santaan-counsel.git
+cd santaan-counsel
+
+# 2. Configure environment
+cp .env.example .env
+nano .env  # Set DB_PASSWORD and JWT_SECRET
+
+# 3. Deploy
+./deploy.sh
+
+# 4. Verify health
+./health-check.sh
+```
+
+📚 **Full guides:**
+- [DEPLOYMENT.md](./DEPLOYMENT.md) - Multi-platform deployment (AWS, DigitalOcean, Railway, Render)
+- [PRODUCTION_CHECKLIST.md](./PRODUCTION_CHECKLIST.md) - Pre/post deployment verification
+- [USER_MANUAL.md](./USER_MANUAL.md) - Complete user documentation
+
+---
 
 ## 📝 License
 
