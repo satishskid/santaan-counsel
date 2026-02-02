@@ -137,7 +137,26 @@ async function main() {
       for (const file of templateFiles) {
         const filePath = path.join(seedsDir, file);
         const fileContent = fs.readFileSync(filePath, 'utf8');
-        const templates = JSON.parse(fileContent);
+        
+        // Skip empty files
+        if (!fileContent || fileContent.trim().length === 0) {
+          console.log(`⚠️  Skipping empty file: ${file}`);
+          continue;
+        }
+        
+        let templates;
+        try {
+          templates = JSON.parse(fileContent);
+        } catch (error) {
+          console.log(`⚠️  Skipping invalid JSON in ${file}: ${error.message}`);
+          continue;
+        }
+        
+        // Skip if templates is empty array
+        if (!Array.isArray(templates) || templates.length === 0) {
+          console.log(`⚠️  Skipping empty template array in: ${file}`);
+          continue;
+        }
         
         // Transform JSON template format to Prisma schema format
         const transformedTemplates = templates
