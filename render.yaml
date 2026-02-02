@@ -1,7 +1,7 @@
 services:
   # Backend API
   - type: web
-    name: actions-santaan
+    name: santaan-backend
     runtime: node
     region: oregon
     plan: free
@@ -21,7 +21,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ORIGIN
-        sync: false
+        value: https://santaan-frontend.onrender.com
 
   # Frontend (Static Site)
   - type: web
@@ -37,7 +37,7 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        sync: false
+        value: https://santaan-backend.onrender.com
 
 databases:
   - name: santaan-db

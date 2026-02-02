@@ -2,7 +2,7 @@
   "services": [
     {
       "type": "web",
-      "name": "actions-santaan",
+      "name": "santaan-backend",
       "runtime": "node",
       "region": "oregon",
       "plan": "free",
@@ -55,7 +55,7 @@
       "envVars": [
         {
           "key": "VITE_API_URL",
-          "value": "https://actions-santaan.onrender.com"
+          "value": "https://santaan-backend.onrender.com"
         }
       ]
     }
