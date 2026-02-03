@@ -237,7 +237,7 @@ export default function AddEventModal({ isOpen, onClose, patient, cycleId, onSuc
         { text },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setExpandedText(response.data.expandedText);
+      setExpandedText(response.data.expanded);
     } catch (err) {
       console.error('Failed to expand acronyms:', err);
     } finally {
@@ -534,7 +534,7 @@ export default function AddEventModal({ isOpen, onClose, patient, cycleId, onSuc
             <>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                 <p className="text-sm text-blue-900">
-                  <strong>Capture patient's reaction</strong> after explaining this event to them.
+                  <strong>Capture patient&apos;s reaction</strong> after explaining this event to them.
                 </p>
               </div>
 
