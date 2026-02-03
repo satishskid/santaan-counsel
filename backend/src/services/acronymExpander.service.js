@@ -111,3 +111,75 @@ export const expandText = async (req, res, next) => {
     next(error);
   }
 };
+
+export const bulkImportAcronyms = async (req, res, next) => {
+  try {
+    const { acronyms } = req.body;
+    
+    // Validate input
+    if (!Array.isArray(acronyms) || acronyms.length === 0) {
+      return res.status(400).json({ 
+        error: 'Invalid input. Expected array of acronyms.' 
+      });
+    }
+    
+    // Validate each acronym object
+    const validAcronyms = [];
+    const errors = [];
+    
+    acronyms.forEach((item, index) => {
+      if (!item.acronym || !item.expansion) {
+        errors.push(`Item ${index}: Missing required fields (acronym, expansion)`);
+        return;
+      }
+      
+      validAcronyms.push({
+        acronym: item.acronym,
+        expansion: item.expansion,
+        unit: item.unit || null,
+        normalRangeMin: item.normalRangeMin || null,
+        normalRangeMax: item.normalRangeMax || null,
+        category: item.category || 'general',
+        clinicId: null, // Global acronyms
+        isActive: true,
+      });
+    });
+    
+    if (errors.length > 0) {
+      return res.status(400).json({ 
+        error: 'Validation errors',
+        details: errors 
+      });
+    }
+    
+    // Check for existing acronyms to avoid duplicates
+    const existingAcronyms = await prisma.acronymDictionary.findMany({
+      where: {
+        acronym: {
+          in: validAcronyms.map(a => a.acronym),
+        },
+      },
+      select: { acronym: true },
+    });
+    
+    const existingSet = new Set(existingAcronyms.map(a => a.acronym));
+    const newAcronyms = validAcronyms.filter(a => !existingSet.has(a.acronym));
+    
+    // Bulk insert new acronyms
+    const result = await prisma.acronymDictionary.createMany({
+      data: newAcronyms,
+      skipDuplicates: true,
+    });
+    
+    res.json({
+      success: true,
+      imported: result.count,
+      skipped: validAcronyms.length - result.count,
+      total: validAcronyms.length,
+      message: `Successfully imported ${result.count} acronyms. Skipped ${validAcronyms.length - result.count} duplicates.`,
+    });
+  } catch (error) {
+    console.error('Bulk import error:', error);
+    next(error);
+  }
+};

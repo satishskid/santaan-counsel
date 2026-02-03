@@ -1,0 +1,132 @@
+{
+  "acronyms": [
+    {
+      "acronym": "ET",
+      "expansion": "Embryo Transfer",
+      "unit": null,
+      "normalRangeMin": null,
+      "normalRangeMax": null,
+      "category": "procedure"
+    },
+    {
+      "acronym": "E2",
+      "expansion": "Estradiol (hormone indicating follicle development)",
+      "unit": "pg/mL",
+      "normalRangeMin": 200,
+      "normalRangeMax": 600,
+      "category": "hormone"
+    },
+    {
+      "acronym": "AFC",
+      "expansion": "Antral Follicle Count (number of resting follicles)",
+      "unit": "count",
+      "normalRangeMin": 5,
+      "normalRangeMax": 15,
+      "category": "measurement"
+    },
+    {
+      "acronym": "AMH",
+      "expansion": "Anti-Müllerian Hormone (ovarian reserve marker)",
+      "unit": "ng/mL",
+      "normalRangeMin": 1.0,
+      "normalRangeMax": 4.0,
+      "category": "hormone"
+    },
+    {
+      "acronym": "FSH",
+      "expansion": "Follicle Stimulating Hormone",
+      "unit": "mIU/mL",
+      "normalRangeMin": 3,
+      "normalRangeMax": 10,
+      "category": "hormone"
+    },
+    {
+      "acronym": "LH",
+      "expansion": "Luteinizing Hormone",
+      "unit": "mIU/mL",
+      "normalRangeMin": 1,
+      "normalRangeMax": 12,
+      "category": "hormone"
+    },
+    {
+      "acronym": "hCG",
+      "expansion": "Human Chorionic Gonadotropin (pregnancy hormone)",
+      "unit": "mIU/mL",
+      "normalRangeMin": null,
+      "normalRangeMax": null,
+      "category": "hormone"
+    },
+    {
+      "acronym": "ICSI",
+      "expansion": "Intracytoplasmic Sperm Injection (single sperm injected into egg)",
+      "unit": null,
+      "normalRangeMin": null,
+      "normalRangeMax": null,
+      "category": "procedure"
+    },
+    {
+      "acronym": "IVF",
+      "expansion": "In Vitro Fertilization",
+      "unit": null,
+      "normalRangeMin": null,
+      "normalRangeMax": null,
+      "category": "procedure"
+    },
+    {
+      "acronym": "FET",
+      "expansion": "Frozen Embryo Transfer",
+      "unit": null,
+      "normalRangeMin": null,
+      "normalRangeMax": null,
+      "category": "procedure"
+    },
+    {
+      "acronym": "MII",
+      "expansion": "Metaphase II (mature egg ready for fertilization)",
+      "unit": null,
+      "normalRangeMin": null,
+      "normalRangeMax": null,
+      "category": "embryology"
+    },
+    {
+      "acronym": "GV",
+      "expansion": "Germinal Vesicle (immature egg)",
+      "unit": null,
+      "normalRangeMin": null,
+      "normalRangeMax": null,
+      "category": "embryology"
+    },
+    {
+      "acronym": "2PN",
+      "expansion": "Two Pronuclei (normal fertilization indicator)",
+      "unit": null,
+      "normalRangeMin": null,
+      "normalRangeMax": null,
+      "category": "embryology"
+    },
+    {
+      "acronym": "3PN",
+      "expansion": "Three Pronuclei (abnormal fertilization)",
+      "unit": null,
+      "normalRangeMin": null,
+      "normalRangeMax": null,
+      "category": "embryology"
+    },
+    {
+      "acronym": "PGT-A",
+      "expansion": "Preimplantation Genetic Testing for Aneuploidy",
+      "unit": null,
+      "normalRangeMin": null,
+      "normalRangeMax": null,
+      "category": "procedure"
+    },
+    {
+      "acronym": "PCOS",
+      "expansion": "Polycystic Ovary Syndrome",
+      "unit": null,
+      "normalRangeMin": null,
+      "normalRangeMax": null,
+      "category": "diagnosis"
+    }
+  ]
+}
