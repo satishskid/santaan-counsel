@@ -247,27 +247,49 @@ export const createWalkin = async (req, res, next) => {
   try {
     const { firstName, lastName, age, phone, email, reason } = req.body;
     
-    // Generate MR number
-    const lastPatient = await prisma.patient.findFirst({
-      where: { clinicId: req.user.clinicId },
-      orderBy: { mrNumber: 'desc' },
-    });
+    // Generate MR number with retry logic to handle race conditions
+    let patient;
+    let attempts = 0;
+    const maxAttempts = 5;
     
-    const lastNumber = lastPatient?.mrNumber ? parseInt(lastPatient.mrNumber.replace(/\D/g, '')) : 0;
-    const mrNumber = `MR${String(lastNumber + 1).padStart(5, '0')}`;
+    while (attempts < maxAttempts) {
+      try {
+        // Get the latest MR number
+        const lastPatient = await prisma.patient.findFirst({
+          where: { clinicId: req.user.clinicId },
+          orderBy: { mrNumber: 'desc' },
+        });
+        
+        const lastNumber = lastPatient?.mrNumber ? parseInt(lastPatient.mrNumber.replace(/\D/g, '')) : 0;
+        const mrNumber = `MR${String(lastNumber + 1 + attempts).padStart(5, '0')}`;
+        
+        // Try to create patient
+        patient = await prisma.patient.create({
+          data: {
+            clinicId: req.user.clinicId,
+            mrNumber,
+            firstName,
+            lastName,
+            age: parseInt(age),
+            phone,
+            email,
+          },
+        });
+        
+        break; // Success, exit loop
+      } catch (error) {
+        if (error.code === 'P2002' && attempts < maxAttempts - 1) {
+          // Unique constraint violation, retry with next number
+          attempts++;
+          continue;
+        }
+        throw error; // Re-throw if not a duplicate or max attempts reached
+      }
+    }
     
-    // Create patient
-    const patient = await prisma.patient.create({
-      data: {
-        clinicId: req.user.clinicId,
-        mrNumber,
-        firstName,
-        lastName,
-        age: parseInt(age),
-        phone,
-        email,
-      },
-    });
+    if (!patient) {
+      throw new Error('Failed to create patient after multiple attempts');
+    }
     
     // Create active cycle
     const cycle = await prisma.treatmentCycle.create({
