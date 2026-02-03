@@ -266,7 +266,6 @@ export const createWalkin = async (req, res, next) => {
         age: parseInt(age),
         phone,
         email,
-        firstVisitDate: new Date(),
       },
     });
     
